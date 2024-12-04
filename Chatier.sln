@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{A8853B3C-4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Core", "src\Chatier.Core\Chatier.Core.csproj", "{939FFFBB-33BA-4A4B-A1D5-E27F349E05C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Functionals", "tests\Chatier.Units\Chatier.Functionals.csproj", "{50D8EA09-EE9B-444B-9612-6B09ADE4647E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Functionals", "tests\Chatier.Functionals\Chatier.Functionals.csproj", "{50D8EA09-EE9B-444B-9612-6B09ADE4647E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
