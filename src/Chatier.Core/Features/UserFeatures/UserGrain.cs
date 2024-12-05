@@ -28,28 +28,28 @@ public sealed class UserGrain : Grain, IUserGrain
         return Task.FromResult(name);
     }
 
-    public Task NotifyAboutAddingToGroupAsync(
-        string groupName,
+    public Task NotifyAboutAddingToChatAsync(
+        string chat,
         string userName)
     {
         return this.HandleNotifyGroupActionAsync(
-            groupName, 
+            chat, 
             userName, 
             UserGroupNotificationType.Joined);
     }
 
-    public Task NotifyAboutLeavingAGroupAsync(
-        string groupName,
+    public Task NotifyAboutLeavingAChatAsync(
+        string chat,
         string userName)
     {
         return this.HandleNotifyGroupActionAsync(
-            groupName,
+            chat,
             userName,
             UserGroupNotificationType.Left);
     }
 
     private async Task HandleNotifyGroupActionAsync(
-        string groupName, 
+        string chat, 
         string userName, 
         UserGroupNotificationType actionType) 
     {
@@ -62,7 +62,7 @@ public sealed class UserGrain : Grain, IUserGrain
             {
                 Id = notificationId,
                 CreatedAt = createdAt,
-                GroupName = groupName,
+                GroupName = chat,
                 ActionType = UserGroupNotificationType.Joined,
                 User = userName
             });
@@ -74,11 +74,11 @@ public sealed class UserGrain : Grain, IUserGrain
             actionType == UserGroupNotificationType.Joined 
                 ? "added" 
                 : "removed",
-            groupName);
+            chat);
 
         var notificationGrain = this.GrainFactory.GetGrain<INotificationGrain>(notificationId);
         await notificationGrain.ScheduleAsync(
-            from: groupName,
+            from: chat,
             to: userName,
             topic: "Group notification",
             content: content,
@@ -137,7 +137,7 @@ public sealed class UserGrain : Grain, IUserGrain
         }
 
         var notificationGrain = this.GrainFactory.GetGrain<INotificationGrain>(notificationId);
-        await notificationGrain.ConfirmAsync();
+        await notificationGrain.ReadAsync();
     }
 
     public Task<Dictionary<Guid, BaseUserNotificationItems>> GetAllNotifications()

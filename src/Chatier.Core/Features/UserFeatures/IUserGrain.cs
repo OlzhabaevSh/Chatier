@@ -4,16 +4,16 @@ public interface IUserGrain : IGrainWithStringKey
 {
     Task<string> GetNameAsync();
 
-    Task NotifyAboutAddingToGroupAsync(
-        string groupName,
+    Task NotifyAboutAddingToChatAsync(
+        string chat,
         string userName);
 
-    Task NotifyAboutLeavingAGroupAsync(
-        string groupName,
+    Task NotifyAboutLeavingAChatAsync(
+        string chat,
         string userName);
 
     Task NotifyAboutMessageAsync(
-        string groupName,
+        string chat,
         string sender,
         Guid messageId,
         string message);

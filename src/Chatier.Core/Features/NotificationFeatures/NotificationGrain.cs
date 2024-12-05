@@ -74,7 +74,7 @@ public class NotificationGrain :
             period: TimeSpan.FromMinutes(1));
     }
 
-    public async Task ConfirmAsync()
+    public async Task ReadAsync()
     {
         var notificationId = this.GetPrimaryKey();
 

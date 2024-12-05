@@ -11,7 +11,7 @@ public interface INotificationGrain : IGrainWithGuidKey
         string content,
         DateTimeOffset createdAt);
 
-    Task ConfirmAsync();
+    Task ReadAsync();
 }
 
 [GenerateSerializer]

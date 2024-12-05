@@ -44,6 +44,8 @@ public class ChatGrain : Grain, IChatGrain
                 "Grain with name '{grainName}' already contains a user with name '{userName}'",
                 grainName,
                 userName);
+
+            return;
         }
 
         this.usersState.State.Users.Add(userName);
@@ -53,8 +55,8 @@ public class ChatGrain : Grain, IChatGrain
         foreach (var user in users)
         {
             var userGrain = this.GrainFactory.GetGrain<IUserGrain>(user);
-            await userGrain.NotifyAboutAddingToGroupAsync(
-                groupName: this.GetPrimaryKeyString(),
+            await userGrain.NotifyAboutAddingToChatAsync(
+                chat: this.GetPrimaryKeyString(),
                 userName: userName);
         }
     }
@@ -78,8 +80,8 @@ public class ChatGrain : Grain, IChatGrain
         foreach (var user in users)
         {
             var userGrain = this.GrainFactory.GetGrain<IUserGrain>(user);
-            await userGrain.NotifyAboutLeavingAGroupAsync(
-                groupName: this.GetPrimaryKeyString(),
+            await userGrain.NotifyAboutLeavingAChatAsync(
+                chat: this.GetPrimaryKeyString(),
                 userName: userName);
         }
     }
@@ -110,7 +112,7 @@ public class ChatGrain : Grain, IChatGrain
         {
             var userGrain = this.GrainFactory.GetGrain<IUserGrain>(user);
             await userGrain.NotifyAboutMessageAsync(
-                groupName: this.GetPrimaryKeyString(),
+                chat: this.GetPrimaryKeyString(),
                 sender: userName,
                 messageId: Guid.NewGuid(),
                 message: message);
