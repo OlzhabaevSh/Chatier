@@ -2,7 +2,7 @@
 
 namespace Chatier.Core.Features.UserFeatures;
 
-public static class UserGrainLoggingHelper
+public static class LoggingHelper
 {
     private static EventId NotificationIdNotFoundId => 
         new EventId(1, "Notification with ID does not exist.");
@@ -18,7 +18,4 @@ public static class UserGrainLoggingHelper
             userName,
             notificationId);
     }
-
-
-
 }

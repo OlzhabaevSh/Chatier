@@ -5,27 +5,21 @@ namespace Chatier.Core.Features.ChatFeatures;
 
 public class ChatGrain : Grain, IChatGrain
 {
-    private readonly IPersistentState<ChatUsersState> usersState;
-    private readonly IPersistentState<ChatMessagesState> messagesState;
+    private readonly IPersistentState<ChatGrainUsersState> usersState;
+    private readonly IPersistentState<ChatGrainMessagesState> messagesState;
 
     private readonly ILogger<ChatGrain> logger;
 
     public ChatGrain(
         [PersistentState("users", "chatStore")]
-        IPersistentState<ChatUsersState> usersState,
+        IPersistentState<ChatGrainUsersState> usersState,
         [PersistentState("messages", "chatStore")]
-        IPersistentState<ChatMessagesState> messagesState,
+        IPersistentState<ChatGrainMessagesState> messagesState,
         ILogger<ChatGrain> logger)
     {
         this.usersState = usersState;
         this.messagesState = messagesState;
         this.logger = logger;
-    }
-
-    public Task<string> GetNameAsync()
-    {
-        var name = this.GetPrimaryKeyString();
-        return Task.FromResult(name);
     }
 
     public Task<string[]> GetUsersAsync()
@@ -92,12 +86,14 @@ public class ChatGrain : Grain, IChatGrain
         return Task.FromResult(messages);
     }
 
-    public async Task SendMessageAsync(
+    public async Task<Guid> SendMessageAsync(
         string userName,
         string message)
     {
+        var messageId = Guid.NewGuid();
+
         this.messagesState.State.Messages.Add(
-            key: Guid.NewGuid(),
+            key: messageId,
             value: new ChatMessageItem()
             {
                 Sender = userName, 
@@ -111,11 +107,33 @@ public class ChatGrain : Grain, IChatGrain
         foreach (var user in users)
         {
             var userGrain = this.GrainFactory.GetGrain<IUserGrain>(user);
-            await userGrain.NotifyAboutMessageAsync(
+            await userGrain.NotifyAboutNewMessageAsync(
                 chat: this.GetPrimaryKeyString(),
                 sender: userName,
-                messageId: Guid.NewGuid(),
+                messageId: messageId,
                 message: message);
         }
+
+        return messageId;
+    }
+
+    public async Task<bool> RemoveMessageAsync(
+        Guid messageId,
+        string caller)
+    {
+        if (!this.messagesState.State.Messages.ContainsKey(messageId))
+        {
+            return false;
+        }
+
+        if (this.messagesState.State.Messages[messageId].Sender != caller)
+        {
+            return false;
+        }
+
+        this.messagesState.State.Messages.Remove(messageId);
+        await this.messagesState.WriteStateAsync();
+
+        return true;
     }
 }
