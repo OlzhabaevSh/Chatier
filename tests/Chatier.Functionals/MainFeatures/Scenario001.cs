@@ -66,6 +66,8 @@ public sealed class Scenario001
             await chat.Grain.SendMessageAsync(
                 userName,
                 message);
+
+            await Task.Delay(200);
         }
 
         // user Charlie joins the chat

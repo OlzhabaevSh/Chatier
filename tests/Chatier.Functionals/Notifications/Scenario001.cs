@@ -51,8 +51,6 @@ public class Scenario001
         await bravo.Grain.ConfirmNotificationAsync(
             am1NId);
 
-        await Task.Delay(200);
-
         var bm1Id = await chat.Grain.SendMessageAsync(
             bravo.Name,
             "Hello, Alpha!");
@@ -63,8 +61,6 @@ public class Scenario001
 
         await alpha.Grain.ConfirmNotificationAsync(
             bm1NId);
-
-        await Task.Delay(200);
 
         await bravo.StatusGrain.SetStatusAsync(false);
 
