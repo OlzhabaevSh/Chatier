@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Core", "src\Chatier
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Functionals", "tests\Chatier.Functionals\Chatier.Functionals.csproj", "{50D8EA09-EE9B-444B-9612-6B09ADE4647E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Apps.SignalrService", "src\apps\Chatier.Apps.SignalrService\Chatier.Apps.SignalrService.csproj", "{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{50D8EA09-EE9B-444B-9612-6B09ADE4647E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{50D8EA09-EE9B-444B-9612-6B09ADE4647E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{50D8EA09-EE9B-444B-9612-6B09ADE4647E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -35,5 +41,6 @@ Global
 		{A8853B3C-46DD-462E-A1AB-93DE1962F1F8} = {A95DAF4B-98C2-4865-93D3-1D22FB7F1BCE}
 		{939FFFBB-33BA-4A4B-A1D5-E27F349E05C6} = {A95DAF4B-98C2-4865-93D3-1D22FB7F1BCE}
 		{50D8EA09-EE9B-444B-9612-6B09ADE4647E} = {A4FC734B-A281-4B74-B1E3-227AA5EFBC36}
+		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A} = {A8853B3C-46DD-462E-A1AB-93DE1962F1F8}
 	EndGlobalSection
 EndGlobal
