@@ -27,6 +27,7 @@ public class BaseTestSiloConfiguration : ISiloConfigurator
         siloBuilder.AddMemoryGrainStorage("userStore");
         siloBuilder.AddMemoryGrainStorage("userNotifications");
         siloBuilder.AddMemoryGrainStorage("PubSubStore");
+        siloBuilder.AddMemoryGrainStorage("UserGroupState");
 
         // configure streams
         siloBuilder.AddMemoryStreams("MemoryStreamProvider");

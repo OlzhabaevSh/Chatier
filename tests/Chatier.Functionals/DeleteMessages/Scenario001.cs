@@ -23,8 +23,6 @@ public class Scenario001
         var alpha = this.CreateUser("alpha");
         var beta = this.CreateUser("beta");
 
-        var chat = this.CreateChat("alpha-beta");
-
         var messages = new List<(string Username, string Message, bool Remove)>() 
         {
             (alpha.Name, "Hello, Beta! How are you?", false),
@@ -34,10 +32,12 @@ public class Scenario001
             (beta.Name, "Have a nice day!", false)
         };
 
-        await chat.Grain.AddUserAsync(alpha.Name);
-        await chat.Grain.AddUserAsync(beta.Name);
-
         //// act
+        var chatName = await alpha.ChatGrain.CreateChatAsync(
+            beta.Name);
+
+        var chat = this.CreateChat(chatName);
+
         foreach (var (userName, message, remove) in messages)
         {
             var messageId = await chat.Grain.SendMessageAsync(
@@ -69,12 +69,19 @@ public class Scenario001
     private User CreateUser(string userName) =>
         new User(
             userName, 
-            this.CreateUserGrain(userName));
+            this.CreateUserGrain(userName),
+            this.CreateUserChatGrain(userName));
 
     private IUserGrain CreateUserGrain(string userName) =>
         Cluster.Client.GetGrain<IUserGrain>(userName);
 
-    record User(string Name, IUserGrain Grain);
+    private IUserChatGrain CreateUserChatGrain(string userName) =>
+        Cluster.Client.GetGrain<IUserChatGrain>(userName);
+
+    record User(
+        string Name, 
+        IUserGrain Grain,
+        IUserChatGrain ChatGrain);
 
     private Chat CreateChat(string chatName) =>
         new Chat(

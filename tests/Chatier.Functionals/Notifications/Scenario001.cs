@@ -29,13 +29,10 @@ public class Scenario001
         var bravo = this.CreateUser("Bravo");
         await bravo.StatusGrain.SetStatusAsync(true);
 
-        // chat
-        var chat = this.CreateChat("a-b");
-
-        await chat.Grain.AddUserAsync(alpha.Name);
-        await chat.Grain.AddUserAsync(bravo.Name);
-
         //// act
+        var chatName = await alpha.ChatGrain.CreateChatAsync(bravo.Name);
+        var chat = this.CreateChat(chatName);
+
         // message naming convention:
         // {sender actorName} + message + {number}:
         // am1: alpha + message + 1
@@ -105,7 +102,8 @@ public class Scenario001
             userName,
             this.GetUserGrain(userName),
             this.GetNotificationGrain(userName),
-            this.GetUserStatusGrain(userName));
+            this.GetUserStatusGrain(userName),
+            this.GetUserChatGrain(userName));
 
     private IUserGrain GetUserGrain(string userName) =>
         Cluster.Client.GetGrain<IUserGrain>(userName);
@@ -116,11 +114,15 @@ public class Scenario001
     private IUserStatusGrain GetUserStatusGrain(string userName) =>
         Cluster.Client.GetGrain<IUserStatusGrain>(userName);
 
+    private IUserChatGrain GetUserChatGrain(string userName) =>
+        Cluster.Client.GetGrain<IUserChatGrain>(userName);
+
     record User(
         string Name, 
         IUserGrain Grain,
         IUserNotificationGrain NotificationGrain,
-        IUserStatusGrain StatusGrain);
+        IUserStatusGrain StatusGrain,
+        IUserChatGrain ChatGrain);
 
     private Chat CreateChat(string chatName) =>
         new Chat(
