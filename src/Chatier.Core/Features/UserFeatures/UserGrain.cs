@@ -138,7 +138,7 @@ public sealed class UserGrain : Grain, IUserGrain
         }
 
         var notificationGrain = this.GrainFactory.GetGrain<INotificationGrain>(notificationId);
-        await notificationGrain.ReadAsync();
+        await notificationGrain.MarkAsReadedAsync();
     }
 
     public Task<Guid> GetLatestMessageNotificationIdAsync() 

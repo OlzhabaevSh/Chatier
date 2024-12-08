@@ -87,7 +87,7 @@ public class NotificationGrain :
         return Task.FromResult(isSent);
     }
 
-    public async Task ReadAsync()
+    public async Task MarkAsReadedAsync()
     {
         var notificationId = this.GetPrimaryKey();
 

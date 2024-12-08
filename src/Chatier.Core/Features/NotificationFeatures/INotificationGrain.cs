@@ -10,7 +10,7 @@ public interface INotificationGrain : IGrainWithGuidKey
         DateTimeOffset createdAt,
         bool scheduleSending = false);
 
-    Task ReadAsync();
+    Task MarkAsReadedAsync();
 
     Task<bool> SentExternally();
 }
