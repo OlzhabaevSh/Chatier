@@ -1,4 +1,6 @@
-﻿namespace Chatier.Core.Features.UserFeatures;
+﻿using Chatier.Core.Features.UserFeatures.Services;
+
+namespace Chatier.Core.Features.UserFeatures;
 
 public interface IUserNotificationGrain : IGrainWithStringKey
 {

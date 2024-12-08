@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Chatier.Core.Features.UserFeatures.Services;
+using Microsoft.Extensions.Logging;
 using Orleans.Utilities;
 
 namespace Chatier.Core.Features.UserFeatures;

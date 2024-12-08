@@ -1,5 +1,6 @@
 ﻿
 using Chatier.Core.Features.UserFeatures;
+using Chatier.Core.Features.UserFeatures.Services;
 using Orleans;
 
 namespace Chatier.Apps.SignalrService.Services;

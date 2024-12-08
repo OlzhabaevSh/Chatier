@@ -1,6 +1,6 @@
 using Chatier.Apps.SignalrService.Hubs;
 using Chatier.Apps.SignalrService.Services;
-using Chatier.Core.Features.UserFeatures;
+using Chatier.Core.Features.UserFeatures.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

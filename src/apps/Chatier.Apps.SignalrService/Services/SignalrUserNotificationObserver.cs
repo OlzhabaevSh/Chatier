@@ -1,5 +1,5 @@
 ﻿using Chatier.Apps.SignalrService.Hubs;
-using Chatier.Core.Features.UserFeatures;
+using Chatier.Core.Features.UserFeatures.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Chatier.Apps.SignalrService.Services;

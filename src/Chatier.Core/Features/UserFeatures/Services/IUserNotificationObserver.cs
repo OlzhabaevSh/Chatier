@@ -1,4 +1,4 @@
-﻿namespace Chatier.Core.Features.UserFeatures;
+﻿namespace Chatier.Core.Features.UserFeatures.Services;
 
 public interface IUserNotificationObserver : IGrainObserver
 {
