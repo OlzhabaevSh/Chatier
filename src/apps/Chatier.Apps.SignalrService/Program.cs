@@ -14,7 +14,7 @@ builder.Services.AddHostedService<NotificationBackgroundService>();
 
 // services
 builder.Services.AddSingleton<IHubGroupStore, HubGroupStore>();
-builder.Services.AddSingleton<IUserNotificationObserver, IUserNotificationObserver>();
+builder.Services.AddSingleton<IUserNotificationObserver, SignalrUserNotificationObserver>();
 builder.Services.AddSingleton<IUserSubscriptionQueue, UserSubscriptionQueue>();
 builder.Services.AddSingleton<IUserUnSubscriptionQueue, UserUnSubscriptionQueue>();
 

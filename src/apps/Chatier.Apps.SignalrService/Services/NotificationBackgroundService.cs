@@ -51,7 +51,7 @@ public class NotificationBackgroundService : BackgroundService
             while (userSubscriptionQueue.TryDequeue(out var userName))
             {
                 var userNotificationGrain = clusterClient
-                    .GetGrain<IUserNotificationGrain>(userName);
+                    .GetGrain<IUserMessageNotificationGrain>(userName);
 
                 await userNotificationGrain.SubscribeAsync(
                     this.signalrObserver);
@@ -69,7 +69,7 @@ public class NotificationBackgroundService : BackgroundService
             while (userUnSubscriptionQueue.TryDequeue(out var userName))
             {
                 var userNotificationGrain = clusterClient
-                    .GetGrain<IUserNotificationGrain>(userName);
+                    .GetGrain<IUserMessageNotificationGrain>(userName);
 
                 await userNotificationGrain.UnsubscribeAsync(
                     this.signalrObserver);

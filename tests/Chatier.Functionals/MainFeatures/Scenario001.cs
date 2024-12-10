@@ -171,8 +171,8 @@ public sealed class Scenario001
     private IChatGrain GetChatGrain(string chatName) =>
         Cluster.Client.GetGrain<IChatGrain>(chatName);
 
-    private IUserNotificationGrain GetNotificationGrain(string userName) =>
-        Cluster.Client.GetGrain<IUserNotificationGrain>(userName);
+    private IUserMessageNotificationGrain GetNotificationGrain(string userName) =>
+        Cluster.Client.GetGrain<IUserMessageNotificationGrain>(userName);
 
     private IUserStatusGrain GetUserStatusGrain(string userName) =>
         Cluster.Client.GetGrain<IUserStatusGrain>(userName);
@@ -180,7 +180,7 @@ public sealed class Scenario001
     record User(
         string Name,
         IUserGrain Grain,
-        IUserNotificationGrain NotificationsGrain,
+        IUserMessageNotificationGrain NotificationsGrain,
         IUserNotificationObserver NotificationObserver,
         IUserStatusGrain StatusGrain);
 

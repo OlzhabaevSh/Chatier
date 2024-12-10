@@ -2,6 +2,7 @@
 
 namespace Chatier.Core.Features.UserFeatures;
 
+#region Interfaces
 public interface IUserChatGrain : IGrainWithStringKey
 {
     Task<UserChatItem[]> GetChatsAsync();
@@ -20,7 +21,9 @@ public interface IUserChatGrain : IGrainWithStringKey
         string groupName, 
         string sender);
 }
+#endregion
 
+#region Implementation
 public class UserGroupGrain : Grain, IUserChatGrain
 {
     private readonly IPersistentState<UserGroupState> state;
@@ -157,7 +160,9 @@ public class UserGroupGrain : Grain, IUserChatGrain
         await chatGrain.AddUserAsync(myName);
     }
 }
+#endregion
 
+#region State model
 [GenerateSerializer]
 public class UserGroupState
 {
@@ -187,3 +192,4 @@ public enum UserChatEnum
     Chat,
     Group
 }
+#endregion
