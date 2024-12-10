@@ -12,12 +12,13 @@ public interface IUserMessageNotificationGrain : IGrainWithStringKey
     Task NotifyAsync(
         Guid notificationId,
         string chatName,
+        string senderName,
         string message,
         DateTimeOffset createdAt);
 
-    Task SubscribeAsync(IUserNotificationObserver observer);
+    Task SubscribeAsync(IUserMessageNotificationObserver observer);
 
-    Task UnsubscribeAsync(IUserNotificationObserver observer);
+    Task UnsubscribeAsync(IUserMessageNotificationObserver observer);
 }
 # endregion
 
@@ -25,24 +26,25 @@ public interface IUserMessageNotificationGrain : IGrainWithStringKey
 public class UserMessageNotificationGrain : Grain, IUserMessageNotificationGrain
 {
     private readonly IPersistentState<UserMessageNotificationGrainState> grainState;
-    private readonly ObserverManager<IUserNotificationObserver> observerManager;
+    private readonly ObserverManager<IUserMessageNotificationObserver> observerManager;
     private readonly ILogger<UserMessageNotificationGrain> logger;
 
     public UserMessageNotificationGrain(
-        [PersistentState("userNotifications", "userStore")]
+        [PersistentState("userMessageNotifications", "userStore")]
         IPersistentState<UserMessageNotificationGrainState> grainState,
         ILogger<UserMessageNotificationGrain> logger)
     {
         this.grainState = grainState;
         this.logger = logger;
-        this.observerManager = new ObserverManager<IUserNotificationObserver>(
+        this.observerManager = new ObserverManager<IUserMessageNotificationObserver>(
             TimeSpan.FromMinutes(5), 
             logger);
     }
 
     public async Task NotifyAsync(
         Guid notificationId, 
-        string chatName, 
+        string chatName,
+        string senderName,
         string message, 
         DateTimeOffset createdAt)
     {
@@ -62,10 +64,11 @@ public class UserMessageNotificationGrain : Grain, IUserMessageNotificationGrain
         {
             observer.ReceiveNotification(
                 notificationId: notificationId,
+                senderName: senderName,
                 chatName: chatName,
                 message: message,
                 createdAt: createdAt,
-                recieverName: this.GetPrimaryKeyString());
+                receiverName: this.GetPrimaryKeyString());
         });
     }
 
@@ -74,13 +77,13 @@ public class UserMessageNotificationGrain : Grain, IUserMessageNotificationGrain
         return Task.FromResult(this.grainState.State.Notifications.ToArray());
     }
 
-    public Task SubscribeAsync(IUserNotificationObserver observer) 
+    public Task SubscribeAsync(IUserMessageNotificationObserver observer) 
     {
         this.observerManager.Subscribe(observer, observer); 
         return Task.CompletedTask; 
     }
 
-    public Task UnsubscribeAsync(IUserNotificationObserver observer) 
+    public Task UnsubscribeAsync(IUserMessageNotificationObserver observer) 
     {
         this.observerManager.Unsubscribe(observer); 
         return Task.CompletedTask; 

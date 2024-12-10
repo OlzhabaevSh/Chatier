@@ -24,13 +24,13 @@ public interface IUserChatGrain : IGrainWithStringKey
 #endregion
 
 #region Implementation
-public class UserGroupGrain : Grain, IUserChatGrain
+public class UserChatGrain : Grain, IUserChatGrain
 {
-    private readonly IPersistentState<UserGroupState> state;
+    private readonly IPersistentState<UserChatGrainState> state;
 
-    public UserGroupGrain(
-        [PersistentState("userChat", "UserGroupState")] 
-        IPersistentState<UserGroupState> state)
+    public UserChatGrain(
+        [PersistentState("userChats", "userStore")] 
+        IPersistentState<UserChatGrainState> state)
     {
         this.state = state;
     }
@@ -164,7 +164,7 @@ public class UserGroupGrain : Grain, IUserChatGrain
 
 #region State model
 [GenerateSerializer]
-public class UserGroupState
+public class UserChatGrainState
 {
     [Id(0)]
     public Dictionary<string, UserChatItem> Chats { get; set; } = new Dictionary<string, UserChatItem>();

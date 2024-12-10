@@ -51,6 +51,6 @@ public class BaseTestSiloConfiguration : ISiloConfigurator
 
     public virtual void CustomizeConfiguration(IConfiguration configuration) 
     {
-        configuration["ReminderIntervalInMilliseconds"] = $"{10000}";
+        configuration["ReminderIntervalInMilliseconds"] = $"{10_000}";
     }
 }

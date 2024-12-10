@@ -31,7 +31,7 @@ public class NotificationBackgroundService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         var objectReference = this.clusterClient
-            .CreateObjectReference<IUserNotificationObserver>(
+            .CreateObjectReference<IUserMessageNotificationObserver>(
                 this.signalrObserver);
 
         var subscriptionTask = Task.Run(() => 

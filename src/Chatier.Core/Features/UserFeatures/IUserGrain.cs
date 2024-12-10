@@ -7,14 +7,6 @@ namespace Chatier.Core.Features.UserFeatures;
 #region Interfaces
 public interface IUserGrain : IGrainWithStringKey
 {
-    Task NotifyAboutAddingToChatAsync(
-        string chat,
-        string userName);
-
-    Task NotifyAboutLeavingAChatAsync(
-        string chat,
-        string userName);
-
     Task NotifyAboutNewMessageAsync(
         string chat,
         string sender,
@@ -35,70 +27,12 @@ public sealed class UserGrain : Grain, IUserGrain
     private readonly ILogger<UserGrain> logger;
 
     public UserGrain(
-        [PersistentState("notifications", "userStore")]
+        [PersistentState("userNotifications", "userStore")]
         IPersistentState<UserNotificationState> notificationState,
         ILogger<UserGrain> logger)
     {
         this.notificationState = notificationState;
         this.logger = logger;
-    }
-
-    public Task NotifyAboutAddingToChatAsync(
-        string chat,
-        string userName)
-    {
-        return this.HandleNotifyGroupActionAsync(
-            chat,
-            userName,
-            UserGroupNotificationType.Joined);
-    }
-
-    public Task NotifyAboutLeavingAChatAsync(
-        string chat,
-        string userName)
-    {
-        return this.HandleNotifyGroupActionAsync(
-            chat,
-            userName,
-            UserGroupNotificationType.Left);
-    }
-
-    private async Task HandleNotifyGroupActionAsync(
-        string chat,
-        string userName,
-        UserGroupNotificationType actionType)
-    {
-        var notificationId = Guid.NewGuid();
-        var createdAt = DateTimeOffset.UtcNow;
-
-        this.notificationState.State.Notifications.Add(
-            key: notificationId,
-            value: new UserGroupNotificationItem()
-            {
-                Id = notificationId,
-                CreatedAt = createdAt,
-                GroupName = chat,
-                ActionType = UserGroupNotificationType.Joined,
-                User = userName
-            });
-
-        await this.notificationState.WriteStateAsync();
-
-        var content = string.Format(
-            "User '{0}' has been {1} from the group '{2}'",
-            userName,
-            actionType == UserGroupNotificationType.Joined
-                ? "added"
-                : "removed",
-            chat);
-
-        var notificationGrain = this.GrainFactory.GetGrain<INotificationGrain>(notificationId);
-        await notificationGrain.ScheduleAsync(
-            from: chat,
-            to: userName,
-            topic: "Group notification",
-            content: content,
-            createdAt: createdAt);
     }
 
     public async Task NotifyAboutNewMessageAsync(
@@ -132,6 +66,7 @@ public sealed class UserGrain : Grain, IUserGrain
         var user = GrainFactory.GetGrain<IUserMessageNotificationGrain>(myName);
         await user.NotifyAsync(
             notificationId: notificationId,
+            senderName: sender,
             chatName: groupName,
             message: message,
             createdAt: createdAt);
@@ -208,24 +143,5 @@ public sealed class UserGotMessageNotificationItem : BaseUserNotificationItems
 
     [Id(2)]
     public required string Message { get; set; }
-}
-
-[GenerateSerializer]
-public sealed class UserGroupNotificationItem : BaseUserNotificationItems
-{
-    [Id(0)]
-    public required string GroupName { get; set; }
-
-    [Id(1)]
-    public required string User { get; set; }
-
-    [Id(2)]
-    public UserGroupNotificationType ActionType { get; set; }
-}
-
-public enum UserGroupNotificationType
-{
-    Joined,
-    Left
 }
 #endregion

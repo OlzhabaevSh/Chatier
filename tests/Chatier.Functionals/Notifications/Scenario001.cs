@@ -160,22 +160,6 @@ public class Scenario001
 
     class TestSiloConfigurations : BaseTestSiloConfiguration
     {
-        public override void CustomizeLogging(
-            ILoggingBuilder loggingBuilder)
-        {
-            loggingBuilder.AddConsole();
-            loggingBuilder.AddFilter<ConsoleLoggerProvider>((category, _) =>
-                category.Contains("Chatier"));
-
-            loggingBuilder.AddDebug();
-        }
-
-        public override void CustomizeServices(
-            IServiceCollection services)
-        {
-            services.AddScoped<IEmailService, FakeEmailService>();
-        }
-
         public override void CustomizeConfiguration(
             IConfiguration configuration)
         {

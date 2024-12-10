@@ -28,16 +28,16 @@ public interface IChatGrain : IGrainWithStringKey
 #region Implementations
 public class ChatGrain : Grain, IChatGrain
 {
-    private readonly IPersistentState<ChatGrainUsersState> usersState;
-    private readonly IPersistentState<ChatGrainMessagesState> messagesState;
+    private readonly IPersistentState<UsersChatGrainState> usersState;
+    private readonly IPersistentState<MessagesChatGrainState> messagesState;
 
     private readonly ILogger<ChatGrain> logger;
 
     public ChatGrain(
-        [PersistentState("users", "chatStore")]
-        IPersistentState<ChatGrainUsersState> usersState,
-        [PersistentState("messages", "chatStore")]
-        IPersistentState<ChatGrainMessagesState> messagesState,
+        [PersistentState("chatUsers", "chatStore")]
+        IPersistentState<UsersChatGrainState> usersState,
+        [PersistentState("chatMessages", "chatStore")]
+        IPersistentState<MessagesChatGrainState> messagesState,
         ILogger<ChatGrain> logger)
     {
         this.usersState = usersState;
@@ -71,10 +71,20 @@ public class ChatGrain : Grain, IChatGrain
         var users = this.usersState.State.Users;
         foreach (var user in users)
         {
-            var userGrain = this.GrainFactory.GetGrain<IUserGrain>(user);
-            await userGrain.NotifyAboutAddingToChatAsync(
-                chat: this.GetPrimaryKeyString(),
-                userName: userName);
+            var userChatNotificationGrain = this.GrainFactory
+                .GetGrain<IUserChatNotificationGrain>(user);
+
+            if (user == userName)
+            {
+                await userChatNotificationGrain.NotifyAddedToChatAsync(
+                    chatName: this.GetPrimaryKeyString());
+            }
+            else 
+            {
+                await userChatNotificationGrain.NotifyUserAddedToChatAsync(
+                    chatName: this.GetPrimaryKeyString(),
+                    userName: userName);
+            }
         }
     }
 
@@ -96,10 +106,20 @@ public class ChatGrain : Grain, IChatGrain
         var users = this.usersState.State.Users;
         foreach (var user in users)
         {
-            var userGrain = this.GrainFactory.GetGrain<IUserGrain>(user);
-            await userGrain.NotifyAboutLeavingAChatAsync(
-                chat: this.GetPrimaryKeyString(),
-                userName: userName);
+            var userChatNotificationGrain = this.GrainFactory
+                .GetGrain<IUserChatNotificationGrain>(user);
+            
+            if(user == userName)
+            {
+                await userChatNotificationGrain.NotifyLeftChatAsync(
+                    chatName: this.GetPrimaryKeyString());
+            }
+            else
+            {
+                await userChatNotificationGrain.NotifyUserLeftChatAsync(
+                    chatName: this.GetPrimaryKeyString(),
+                    userName: userName);
+            }
         }
     }
 
@@ -164,14 +184,14 @@ public class ChatGrain : Grain, IChatGrain
 
 #region State model
 [GenerateSerializer]
-public class ChatGrainUsersState
+public class UsersChatGrainState
 {
     [Id(0)]
     public required HashSet<string> Users { get; set; } = new HashSet<string>();
 }
 
 [GenerateSerializer]
-public class ChatGrainMessagesState
+public class MessagesChatGrainState
 {
     [Id(0)]
     public required Dictionary<Guid, ChatMessageItem> Messages { get; set; } = new Dictionary<Guid, ChatMessageItem>();

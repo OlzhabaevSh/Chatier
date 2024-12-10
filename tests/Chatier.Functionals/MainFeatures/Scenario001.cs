@@ -17,7 +17,7 @@ namespace MainFeatures;
 public sealed class Scenario001
 {
     private static TestCluster Cluster;
-    private Mock<IUserNotificationObserver> notificationObserverMock = new Mock<IUserNotificationObserver>();
+    private Mock<IUserMessageNotificationObserver> notificationObserverMock = new Mock<IUserMessageNotificationObserver>();
 
     [TestMethod]
     public async Task ThreeUsersConversationTest()
@@ -117,6 +117,7 @@ public sealed class Scenario001
                 It.IsAny<Guid>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<DateTimeOffset>(),
                 alpha.Name),
             Times.Exactly(alpha_historyNotifications.Length));
@@ -128,6 +129,7 @@ public sealed class Scenario001
                 It.IsAny<Guid>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
+                It.IsAny<string>(),
                 It.IsAny<DateTimeOffset>(),
                 bravo.Name),
             Times.Exactly(bravo_historyNotifications.Length));
@@ -137,6 +139,7 @@ public sealed class Scenario001
         notificationObserverMock.Verify(
             x => x.ReceiveNotification(
                 It.IsAny<Guid>(),
+                It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<DateTimeOffset>(),
@@ -161,9 +164,9 @@ public sealed class Scenario001
             userStatusGrain);
     }
 
-    private IUserNotificationObserver GetNotificationObserver(
-        IUserNotificationObserver observer) =>
-            Cluster.Client.CreateObjectReference<IUserNotificationObserver>(observer);
+    private IUserMessageNotificationObserver GetNotificationObserver(
+        IUserMessageNotificationObserver observer) =>
+            Cluster.Client.CreateObjectReference<IUserMessageNotificationObserver>(observer);
 
     private IUserGrain GetUserGrain(string userName) =>
         Cluster.Client.GetGrain<IUserGrain>(userName);
@@ -181,7 +184,7 @@ public sealed class Scenario001
         string Name,
         IUserGrain Grain,
         IUserMessageNotificationGrain NotificationsGrain,
-        IUserNotificationObserver NotificationObserver,
+        IUserMessageNotificationObserver NotificationObserver,
         IUserStatusGrain StatusGrain);
 
     private Chat CreateChat(string name) =>
