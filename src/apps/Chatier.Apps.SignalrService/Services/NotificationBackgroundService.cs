@@ -8,75 +8,67 @@ namespace Chatier.Apps.SignalrService.Services;
 public class NotificationBackgroundService : BackgroundService
 {
     private readonly IClusterClient clusterClient; 
-    private readonly SignalrUserNotificationObserver signalrObserver;
-    private readonly IUserSubscriptionQueue userSubscriptionQueue;
-    private readonly IUserUnSubscriptionQueue userUnSubscriptionQueue;
+    private readonly SignalrUserMessageNotificationObserver signalrObserver;
+    private readonly IUserNotificationChannel userNotificationChannel;
     private readonly ILogger<NotificationBackgroundService> logger;
 
 
     public NotificationBackgroundService(
         IClusterClient clusterClient,
-        SignalrUserNotificationObserver signalrObserver,
-        IUserSubscriptionQueue userSubscriptionQueue,
-        IUserUnSubscriptionQueue userUnSubscriptionQueue,
+        SignalrUserMessageNotificationObserver signalrObserver,
+        IUserNotificationChannel userNotificationChannel,
         ILogger<NotificationBackgroundService> logger)
     {
         this.clusterClient = clusterClient;
         this.signalrObserver = signalrObserver;
-        this.userSubscriptionQueue = userSubscriptionQueue;
-        this.userUnSubscriptionQueue = userUnSubscriptionQueue;
+        this.userNotificationChannel = userNotificationChannel;
         this.logger = logger;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var objectReference = this.clusterClient
-            .CreateObjectReference<IUserMessageNotificationObserver>(
-                this.signalrObserver);
-
+        this.logger.LogInformation("Notification background service is starting.");
         var subscriptionTask = Task.Run(() => 
             this.CreateSubsciptionTask(stoppingToken));
 
-        var unsubscriptionTask = Task.Run(() =>
+        var unSubscriptionTask = Task.Run(() =>
             this.CreateUnsubscriptionTask(stoppingToken));
 
-        await Task.WhenAll(subscriptionTask, unsubscriptionTask);
+        await Task.WhenAll(subscriptionTask, unSubscriptionTask);
+        this.logger.LogInformation("Notification background service is stopping.");
     }
 
     private async Task CreateSubsciptionTask(CancellationToken cancellationToken) 
     {
-        while (!cancellationToken.IsCancellationRequested) 
+        this.logger.LogInformation("Subscription task is starting.");
+        await foreach(var item in this.userNotificationChannel
+            .GetSubscriptionEnumerableAsync(cancellationToken))
         {
-            // Process the queue for new user subscriptions
-            while (userSubscriptionQueue.TryDequeue(out var userName))
-            {
-                var userNotificationGrain = clusterClient
-                    .GetGrain<IUserMessageNotificationGrain>(userName);
+            this.logger.LogTrace("Subscribing to user {userName}.", item.userName);
+            var userNotificationGrain = clusterClient
+                .GetGrain<IUserMessageNotificationGrain>(item.userName);
+            await userNotificationGrain.SubscribeAsync(
+                this.signalrObserver);
 
-                await userNotificationGrain.SubscribeAsync(
-                    this.signalrObserver);
-            }
-            // Add a delay to avoid tight loop
-            await Task.Delay(1000, cancellationToken);
+            await Task.Delay(200, cancellationToken);
         }
+        this.logger.LogInformation("Subscription task is stopping.");
     }
 
     private async Task CreateUnsubscriptionTask(CancellationToken cancellationToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        this.logger.LogInformation("UnSubscription task is starting.");
+        await foreach(var item in this.userNotificationChannel
+            .GetUnSubscriptionEnumerableAsync(cancellationToken))
         {
-            // Process the queue for new user subscriptions
-            while (userUnSubscriptionQueue.TryDequeue(out var userName))
-            {
-                var userNotificationGrain = clusterClient
-                    .GetGrain<IUserMessageNotificationGrain>(userName);
+            this.logger.LogTrace("Unsubscribing from user {userName}.", item.userName);
+            var userNotificationGrain = clusterClient
+                .GetGrain<IUserMessageNotificationGrain>(item.userName);
+            await userNotificationGrain.UnsubscribeAsync(
+                this.signalrObserver);
 
-                await userNotificationGrain.UnsubscribeAsync(
-                    this.signalrObserver);
-            }
-
-            // Add a delay to avoid tight loop
-            await Task.Delay(1000, cancellationToken);
+            await Task.Delay(200, cancellationToken);
         }
+        this.logger.LogInformation("UnSubscription task is stopping.");
     }
 }

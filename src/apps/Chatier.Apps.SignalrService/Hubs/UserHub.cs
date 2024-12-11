@@ -5,18 +5,12 @@ namespace Chatier.Apps.SignalrService.Hubs;
 
 public class UserHub : Hub
 {
-    private readonly IHubGroupStore groupStore;
-    private readonly IUserSubscriptionQueue userSubscriptionQueue;
-    private readonly IUserUnSubscriptionQueue userUnSubscriptionQueue;
+    private readonly IUserNotificationChannel userNotificationChannel;
 
     public UserHub(
-        IHubGroupStore groupStore, 
-        IUserSubscriptionQueue userSubscriptionQueue,
-        IUserUnSubscriptionQueue userUnSubscriptionQueue)
+        IUserNotificationChannel userNotificationChannel)
     {
-        this.groupStore = groupStore;
-        this.userSubscriptionQueue = userSubscriptionQueue;
-        this.userUnSubscriptionQueue = userUnSubscriptionQueue;
+        this.userNotificationChannel = userNotificationChannel;
     }
 
     public override async Task OnConnectedAsync()
@@ -24,16 +18,11 @@ public class UserHub : Hub
         var connectionId = this.Context.ConnectionId;
         var userName = this.GetUserName();
 
-        var isGroupHasConnections = await this.groupStore
-            .IsGroupHasConnections(userName);
-
-        await this.groupStore.AddToGroupAsync(userName, connectionId);
         await this.Groups.AddToGroupAsync(connectionId, userName);
 
-        if(!isGroupHasConnections)
-        {
-            this.userSubscriptionQueue.Enqueue(userName);
-        }
+        await this.userNotificationChannel.SubscribeAsync(
+            userName, 
+            connectionId);
 
         await base.OnConnectedAsync();
     }
@@ -43,16 +32,9 @@ public class UserHub : Hub
         var connectionId = this.Context.ConnectionId;
         var userName = this.GetUserName();
 
-        await this.groupStore.RemoveFromGroupAsync(userName, connectionId);
-        await this.Groups.RemoveFromGroupAsync(connectionId, userName);
-
-        var isGroupHasConnections = await this.groupStore
-            .IsGroupHasConnections(userName);
-
-        if (!isGroupHasConnections)
-        {
-            this.userUnSubscriptionQueue.Enqueue(userName);
-        }
+        await this.userNotificationChannel.UnSubscribeAsync(
+            userName,
+            connectionId);
 
         await base.OnDisconnectedAsync(exception);
     }

@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Chatier.Apps.SignalrService.Services;
 
-public class SignalrUserNotificationObserver : IUserMessageNotificationObserver
+public class SignalrUserMessageNotificationObserver : IUserMessageNotificationObserver
 {
     private readonly IHubContext<UserHub> hubContext;
 
-    public SignalrUserNotificationObserver(IHubContext<UserHub> hubContext)
+    public SignalrUserMessageNotificationObserver(IHubContext<UserHub> hubContext)
     {
         this.hubContext = hubContext;
     }
@@ -24,7 +24,7 @@ public class SignalrUserNotificationObserver : IUserMessageNotificationObserver
         await this.hubContext.Clients
             .Group(receiverName)
             .SendAsync(
-                "ReceiveNotification", 
+                "MessageNotification", 
                 notificationId, 
                 chatName,
                 senderName,

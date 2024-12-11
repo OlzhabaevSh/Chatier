@@ -13,10 +13,9 @@ builder.Services.AddSignalR();
 builder.Services.AddHostedService<NotificationBackgroundService>();
 
 // services
-builder.Services.AddSingleton<IHubGroupStore, HubGroupStore>();
-builder.Services.AddSingleton<IUserMessageNotificationObserver, SignalrUserNotificationObserver>();
-builder.Services.AddSingleton<IUserSubscriptionQueue, UserSubscriptionQueue>();
-builder.Services.AddSingleton<IUserUnSubscriptionQueue, UserUnSubscriptionQueue>();
+builder.Services.AddSingleton<IUserMessageNotificationObserver, SignalrUserMessageNotificationObserver>();
+builder.Services.AddSingleton<IUserChatNotificationObserver, SignalrUserChatNotificationObserver>();
+builder.Services.AddSingleton<IUserNotificationChannel, UserNotificationChannel>();
 
 var app = builder.Build();
 
