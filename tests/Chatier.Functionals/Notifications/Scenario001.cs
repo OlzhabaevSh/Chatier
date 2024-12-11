@@ -1,13 +1,9 @@
 ﻿using Chatier.Core.Features.ChatFeatures;
 using Chatier.Core.Features.NotificationFeatures;
-using Chatier.Core.Features.NotificationFeatures.Services;
 using Chatier.Core.Features.UserFeatures;
 using Chatier.Functionals.Configs;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 using Orleans.TestingHost;
 
 namespace Notifications;

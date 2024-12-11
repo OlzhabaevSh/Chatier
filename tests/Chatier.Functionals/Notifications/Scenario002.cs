@@ -1,5 +1,4 @@
-﻿using Chatier.Core.Features.ChatFeatures;
-using Chatier.Core.Features.UserFeatures;
+﻿using Chatier.Core.Features.UserFeatures;
 using Chatier.Core.Features.UserFeatures.Services;
 using Chatier.Functionals.Configs;
 using FluentAssertions;

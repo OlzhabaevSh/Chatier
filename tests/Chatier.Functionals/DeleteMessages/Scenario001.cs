@@ -1,12 +1,7 @@
 ﻿using Chatier.Core.Features.ChatFeatures;
-using Chatier.Core.Features.NotificationFeatures.Services;
 using Chatier.Core.Features.UserFeatures;
 using Chatier.Functionals.Configs;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 using Orleans.TestingHost;
 
 namespace DeleteMessages;
@@ -114,27 +109,6 @@ public class Scenario001
 
     class TestSiloConfigurations : BaseTestSiloConfiguration
     {
-        public override void CustomizeLogging(
-            ILoggingBuilder loggingBuilder)
-        {
-            loggingBuilder.AddConsole();
-            loggingBuilder.AddFilter<ConsoleLoggerProvider>((category, _) =>
-                category.Contains("Chatier"));
-
-            loggingBuilder.AddDebug();
-        }
-
-        public override void CustomizeServices(
-            IServiceCollection services)
-        {
-            services.AddScoped<IEmailService, FakeEmailService>();
-        }
-
-        public override void CustomizeConfiguration(
-            IConfiguration configuration)
-        {
-            configuration["ReminderIntervalInMilliseconds"] = $"{10000}";
-        }
     }
 
     #endregion
