@@ -1,8 +1,10 @@
 ﻿using Chatier.Apps.SignalrService.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Chatier.Apps.SignalrService.Hubs;
 
+[AllowAnonymous]
 public class UserHub : Hub
 {
     private readonly IUserNotificationChannel userNotificationChannel;
@@ -41,6 +43,8 @@ public class UserHub : Hub
 
     private string GetUserName()
     {
-        return Context.GetHttpContext().Request.Headers["Chatier-User-Name"];
+        var httpContext = this.Context.GetHttpContext();
+        var userName = httpContext.Request.Query["userName"];
+        return userName;
     }
 }

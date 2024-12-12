@@ -140,12 +140,15 @@ public class UserChatNotificationGrain : Grain, IUserChatNotificationGrain
 
     public Task SubscribeAsync(IUserChatNotificationObserver observer) 
     {
+        var myName = this.GetPrimaryKeyString();
         this.observerManager.Subscribe(observer, observer);
         return Task.CompletedTask;
     }
 
     public Task UnsubscribeAsync(IUserChatNotificationObserver observer) 
     {
+        var myName = this.GetPrimaryKeyString();
+        this.observerManager.Unsubscribe(observer);
         return Task.CompletedTask;
     }
 }

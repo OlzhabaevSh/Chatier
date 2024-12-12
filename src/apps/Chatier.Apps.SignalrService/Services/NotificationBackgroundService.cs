@@ -7,20 +7,23 @@ namespace Chatier.Apps.SignalrService.Services;
 
 public class NotificationBackgroundService : BackgroundService
 {
-    private readonly IClusterClient clusterClient; 
-    private readonly SignalrUserMessageNotificationObserver signalrObserver;
+    private readonly IClusterClient clusterClient;
+    //private readonly IUserMessageNotificationObserver signalrObserver;
+    private readonly IUserChatNotificationObserver userChatNotificationObserver;
     private readonly IUserNotificationChannel userNotificationChannel;
     private readonly ILogger<NotificationBackgroundService> logger;
 
 
     public NotificationBackgroundService(
         IClusterClient clusterClient,
-        SignalrUserMessageNotificationObserver signalrObserver,
+        //IUserMessageNotificationObserver signalrObserver,
+        IUserChatNotificationObserver userChatNotificationObserver,
         IUserNotificationChannel userNotificationChannel,
         ILogger<NotificationBackgroundService> logger)
     {
         this.clusterClient = clusterClient;
-        this.signalrObserver = signalrObserver;
+        this.userChatNotificationObserver = userChatNotificationObserver;
+
         this.userNotificationChannel = userNotificationChannel;
         this.logger = logger;
     }
@@ -45,10 +48,15 @@ public class NotificationBackgroundService : BackgroundService
             .GetSubscriptionEnumerableAsync(cancellationToken))
         {
             this.logger.LogTrace("Subscribing to user {userName}.", item.userName);
-            var userNotificationGrain = clusterClient
-                .GetGrain<IUserMessageNotificationGrain>(item.userName);
-            await userNotificationGrain.SubscribeAsync(
-                this.signalrObserver);
+            var userChatNotificationGrain = this.clusterClient
+                .GetGrain<IUserChatNotificationGrain>(item.userName);
+
+            var observerReference = this.clusterClient
+                .CreateObjectReference<IUserChatNotificationObserver>(
+                    userChatNotificationObserver);
+
+            await userChatNotificationGrain.SubscribeAsync(
+                observerReference);
 
             await Task.Delay(200, cancellationToken);
         }
@@ -62,10 +70,15 @@ public class NotificationBackgroundService : BackgroundService
             .GetUnSubscriptionEnumerableAsync(cancellationToken))
         {
             this.logger.LogTrace("Unsubscribing from user {userName}.", item.userName);
-            var userNotificationGrain = clusterClient
-                .GetGrain<IUserMessageNotificationGrain>(item.userName);
-            await userNotificationGrain.UnsubscribeAsync(
-                this.signalrObserver);
+            var userChatNotificationGrain = this.clusterClient
+                .GetGrain<IUserChatNotificationGrain>(item.userName);
+
+            var observerReference = this.clusterClient
+                .CreateObjectReference<IUserChatNotificationObserver>(
+                    userChatNotificationObserver);
+
+            await userChatNotificationGrain.SubscribeAsync(
+                observerReference);
 
             await Task.Delay(200, cancellationToken);
         }

@@ -22,11 +22,7 @@ const userName = window.localStorage.getItem(key);
 console.info('User Name: ', userName);
 
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl('https://localhost:7149/userHub', {
-    headers: {
-      'Chatier-User-Name': userName!,
-    },
-  })
+  .withUrl(`https://localhost:7149/userHub?userName=${userName}`)
   .withAutomaticReconnect()
   .build();
 
