@@ -9,7 +9,13 @@ export const useNotifications = () => {
   useEffect(() => {
     const handleChatNotificationReceived = (event: Event) => {
       const customEvent = event as CustomEvent<IUserChatNotification>;
-      setChats(prevChats => [...prevChats, customEvent.detail]);
+      setChats(prevChats => {
+        const chatExists = prevChats.some(chat => chat.chatName === customEvent.detail.chatName);
+        if (chatExists) {
+          return prevChats;
+        }
+        return [...prevChats, customEvent.detail];
+      });
     };
 
     const handleMessageNotificationReceived = (event: Event) => {
