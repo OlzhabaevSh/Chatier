@@ -14,7 +14,10 @@ public interface IUserMessageNotificationGrain : IGrainWithStringKey
         string chatName,
         string senderName,
         string message,
-        DateTimeOffset createdAt);
+        DateTimeOffset createdAt,
+        Guid messageId);
+
+    Task<Guid> GetNotificationIdAsync(Guid messageId);
 
     Task SubscribeAsync(IUserMessageNotificationObserver observer);
 
@@ -46,7 +49,8 @@ public class UserMessageNotificationGrain : Grain, IUserMessageNotificationGrain
         string chatName,
         string senderName,
         string message, 
-        DateTimeOffset createdAt)
+        DateTimeOffset createdAt,
+        Guid messageId)
     {
         var model = new UserMessageNotificationModel()
         {
@@ -54,7 +58,8 @@ public class UserMessageNotificationGrain : Grain, IUserMessageNotificationGrain
             Message = message,
             CreatedAt = createdAt,
             NotificationId = notificationId,
-            RecieverName = this.GetPrimaryKeyString()
+            RecieverName = this.GetPrimaryKeyString(),
+            MessageId = messageId
         };
 
         this.grainState.State.Notifications.Add(model);
@@ -68,13 +73,21 @@ public class UserMessageNotificationGrain : Grain, IUserMessageNotificationGrain
                 chatName: chatName,
                 message: message,
                 createdAt: createdAt,
-                receiverName: this.GetPrimaryKeyString());
+                receiverName: this.GetPrimaryKeyString(),
+                messageId: messageId);
         });
     }
 
     public Task<UserMessageNotificationModel[]> GetHistoryAsync()
     {
         return Task.FromResult(this.grainState.State.Notifications.ToArray());
+    }
+
+    public Task<Guid> GetNotificationIdAsync(Guid messageId)
+    {
+        var notification = this.grainState.State.Notifications
+            .FirstOrDefault(x => x.MessageId == messageId);
+        return Task.FromResult(notification?.NotificationId ?? Guid.Empty);
     }
 
     public Task SubscribeAsync(IUserMessageNotificationObserver observer) 
@@ -115,5 +128,8 @@ public class UserMessageNotificationModel
 
     [Id(4)]
     public required string RecieverName { get; init; }
+
+    [Id(5)]
+    public Guid MessageId { get; set; }
 }
 #endregion

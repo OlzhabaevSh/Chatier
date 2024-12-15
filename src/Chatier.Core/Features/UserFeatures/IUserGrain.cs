@@ -58,7 +58,8 @@ public sealed class UserGrain : Grain, IUserGrain
                 CreatedAt = createdAt,
                 GroupName = groupName,
                 Sender = sender,
-                Message = message
+                Message = message,
+                MessageId = messageId
             });
 
         await this.notificationState.WriteStateAsync();
@@ -69,7 +70,8 @@ public sealed class UserGrain : Grain, IUserGrain
             senderName: sender,
             chatName: groupName,
             message: message,
-            createdAt: createdAt);
+            createdAt: createdAt,
+            messageId: messageId);
 
         var notificationGrain = this.GrainFactory.GetGrain<INotificationGrain>(
             notificationId);
@@ -80,6 +82,7 @@ public sealed class UserGrain : Grain, IUserGrain
             topic: "New message",
             content: message,
             createdAt: createdAt,
+            messageId: messageId,
             scheduleSending: true);
     }
 
@@ -143,5 +146,8 @@ public sealed class UserGotMessageNotificationItem : BaseUserNotificationItems
 
     [Id(2)]
     public required string Message { get; set; }
+
+    [Id(3)]
+    public Guid MessageId { get; set; }
 }
 #endregion

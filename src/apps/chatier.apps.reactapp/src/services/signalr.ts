@@ -9,11 +9,27 @@ interface IUserChatNotification {
 }
 
 interface IUserMessageNotification {
+    id: string;
     notificationId: string;
     chatName: string,
     senderName: string,
     message: string,
     createdAt: Date;
+}
+
+export interface IUserChat {
+  name: string;
+  FriendlyName: string;
+  ChatType: 0 | 1 | 2; // ownm, chat, group
+  owner: string;
+}
+
+export interface IChatMessage {
+  id: string;
+  chatName: string;
+  sender: string;
+  message: string;
+  createdAt: Date;
 }
 
 const key = 'chatierUserName';
@@ -38,6 +54,16 @@ connection.on('MessageNotification', (notification: IUserMessageNotification) =>
   eventTarget.dispatchEvent(event);
 });
 
+connection.on('ReceiveChats', (chats: IUserChat[]) => {
+  const event = new CustomEvent('chatsReceived', { detail: chats });
+  eventTarget.dispatchEvent(event);
+});
+
+connection.on('ReceiveMessages', (messages: IChatMessage[]) => {
+  const event = new CustomEvent('messagesReceived', { detail: messages });
+  eventTarget.dispatchEvent(event);
+});
+
 const startConnection = async () => {
   try {
     await connection.start();
@@ -47,6 +73,18 @@ const startConnection = async () => {
   }
 };
 
-export { eventTarget, startConnection };  
+const createChat = async (userName: string) => {
+  await connection.invoke('CreateChatAsync', userName);
+};
+
+const sendMessage = async (chatName: string, message: string) => {
+  await connection.invoke('SendMessageAsync', chatName, message);
+};
+
+const selectChat = async (chatName: string) => {
+  await connection.invoke('GetMessagesFromChatAsync', chatName);
+};
+
+export { eventTarget, startConnection, createChat, sendMessage, selectChat };  
 export type { IUserChatNotification, IUserMessageNotification };
 

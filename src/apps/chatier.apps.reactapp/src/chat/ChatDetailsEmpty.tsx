@@ -1,9 +1,20 @@
-import { DocumentCard, DocumentCardTitle } from "@fluentui/react";
+import { DocumentCard, DocumentCardTitle, IStackStyles, Stack } from "@fluentui/react";
+
+const centerStyles: IStackStyles = {
+    root: {
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100%'
+    }
+};
 
 export const ChatDetailsEmpty = () => {
     return(
-        <DocumentCard>
-            <DocumentCardTitle title="Empty" />
-        </DocumentCard>
+        <Stack styles={centerStyles}>
+            <DocumentCard>
+                <DocumentCardTitle title="Empty" />
+            </DocumentCard>
+        </Stack>
     );
 };

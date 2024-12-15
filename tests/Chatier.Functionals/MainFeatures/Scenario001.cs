@@ -119,7 +119,8 @@ public sealed class Scenario001
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<DateTimeOffset>(),
-                alpha.Name),
+                alpha.Name,
+                It.IsAny<Guid>()),
             Times.Exactly(alpha_historyNotifications.Length));
 
         // Bravo
@@ -131,7 +132,8 @@ public sealed class Scenario001
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<DateTimeOffset>(),
-                bravo.Name),
+                bravo.Name,
+                It.IsAny<Guid>()),
             Times.Exactly(bravo_historyNotifications.Length));
 
         // Charlie
@@ -143,7 +145,8 @@ public sealed class Scenario001
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<DateTimeOffset>(),
-                charlie.Name),
+                charlie.Name,
+                It.IsAny<Guid>()),
             Times.Exactly(charlie_historyNotifications.Length));
     }
 

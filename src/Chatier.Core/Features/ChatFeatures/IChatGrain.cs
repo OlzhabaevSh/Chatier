@@ -139,6 +139,7 @@ public class ChatGrain : Grain, IChatGrain
             key: messageId,
             value: new ChatMessageItem()
             {
+                Id = messageId,
                 Sender = userName,
                 Message = message,
                 CreatedAt = DateTimeOffset.UtcNow
@@ -201,12 +202,15 @@ public class MessagesChatGrainState
 public class ChatMessageItem
 {
     [Id(0)]
-    public required string Sender { get; set; }
+    public Guid Id { get; init; }
 
     [Id(1)]
-    public required string Message { get; set; }
+    public required string Sender { get; init; }
 
     [Id(2)]
-    public DateTimeOffset CreatedAt { get; set; }
+    public required string Message { get; init; }
+
+    [Id(3)]
+    public DateTimeOffset CreatedAt { get; init; }
 }
 #endregion

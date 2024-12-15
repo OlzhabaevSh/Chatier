@@ -1,8 +1,9 @@
 import { IStackStyles, Stack } from "@fluentui/react";
 import { ChatMaster } from "./chatMaster";
 import { ChatDetails } from "./chatDetails";
-import { useState } from "react";
+import { useEffect } from "react";
 import { useNotifications } from "../hooks/useNotifications";
+import { Container } from "../layout/container";
 
 const stackStyles: Partial<IStackStyles> = {
     root: {
@@ -15,10 +16,23 @@ const stackStyles: Partial<IStackStyles> = {
 };
 
 export const ChatDashboard = () => {
+    const { 
+        chats, 
+        messages, 
+        createChat, 
+        sendMessage, 
+        selectedChat,
+        setSelectedChat,
+    } = useNotifications();
 
-    const [selectedChat, setSelectedChat] = useState<string | undefined>(undefined);
-    const { chats, messages } = useNotifications();
-    
+    useEffect(() => {
+        if(!selectedChat) {
+            return;
+        };
+
+        setSelectedChat(selectedChat);
+    }, [setSelectedChat, selectedChat]);
+
     return (
         <Stack
             horizontalAlign="baseline" 
@@ -27,14 +41,21 @@ export const ChatDashboard = () => {
             horizontal
             styles={stackStyles}>
                 <Stack.Item align="auto" grow={3}>
-                    <ChatMaster 
-                        chats={chats}
-                        setSelectedChat={setSelectedChat} />
+                    <Container>
+                        <ChatMaster 
+                            chats={chats}
+                            setSelectedChat={setSelectedChat}
+                            createChat={createChat}
+                            selectedChat={selectedChat} />
+                    </Container>
                 </Stack.Item>
                 <Stack.Item align="stretch" grow={7}>
-                    <ChatDetails 
-                        messages={messages}
-                        selectedChat={selectedChat} />
+                    <Container>
+                        <ChatDetails 
+                            selectedChat={selectedChat}
+                            messages={messages}
+                            sendMessage={sendMessage} />
+                    </Container>
                 </Stack.Item>
         </Stack>
     );

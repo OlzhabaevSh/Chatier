@@ -1,13 +1,17 @@
-import { IUserMessageNotification } from "../services/signalr";
+import { IMessage } from "../hooks/useNotifications";
 import { ChatDetailsEmpty } from "./ChatDetailsEmpty";
+import { ChatDetailsMain } from "./chatDetailsMain";
 
-interface IChatDetailsProps {
-    messages: IUserMessageNotification[];
-    selectedChat: string | undefined;
+export interface IChatDetailsProps {
+    messages: IMessage[];
+    selectedChat: string | undefined
+    sendMessage: (chatName: string, message: string) => Promise<void>;
 }
 
 export const ChatDetails = (props: IChatDetailsProps) => {
-    return (<>
-        {props.selectedChat ? <div>List</div> : <ChatDetailsEmpty />}
-    </>)
+    return (
+        <>
+            {props.selectedChat ? <ChatDetailsMain {...props} /> : <ChatDetailsEmpty />}
+        </>
+    )
 };

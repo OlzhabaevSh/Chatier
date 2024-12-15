@@ -5,6 +5,7 @@ import { ChatDashboard } from './chat/chatDashboard';
 import { useUser } from './hooks/useUser';
 import { Redirect, Route, BrowserRouter as Router, Switch } from 'react-router-dom';
 import { Login } from './layout/login';
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
 
 const stackTokens: IStackTokens = { 
   childrenGap: 0
@@ -18,6 +19,8 @@ const stackStyles: Partial<IStackStyles> = {
     height: '100vh'
   },
 };
+
+initializeIcons();
 
 export const App: React.FunctionComponent = () => {
   const [userName] = useUser();

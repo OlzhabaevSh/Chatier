@@ -2,6 +2,7 @@
 using Chatier.Core.Features.UserFeatures;
 using Chatier.Core.Features.UserFeatures.Services;
 using Microsoft.AspNetCore.SignalR;
+using System.Text.Json.Serialization;
 
 namespace Chatier.Apps.SignalrService.Services;
 
@@ -26,10 +27,22 @@ public class SignalrUserChatNotificationObserver : IUserChatNotificationObserver
             .Group(receiverName)
             .SendAsync(
                 "ChatNotifications",
-                notificationId,
-                chatName,
-                userName,
-                notificationType,
-                createdAt);
+                new EventModel() 
+                {
+                    NotificationId = notificationId,
+                    ChatName = chatName,
+                    UserName = userName,
+                    NotificationType = notificationType,
+                    CreatedAt = createdAt
+                });
+    }
+
+    class EventModel 
+    {
+        public Guid NotificationId { get; set; }
+        public string ChatName { get; set; }
+        public string UserName { get; set; }
+        public UserGroupNotificationType NotificationType { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
     }
 }

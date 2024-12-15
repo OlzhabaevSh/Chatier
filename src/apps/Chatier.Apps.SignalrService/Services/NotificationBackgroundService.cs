@@ -8,7 +8,7 @@ namespace Chatier.Apps.SignalrService.Services;
 public class NotificationBackgroundService : BackgroundService
 {
     private readonly IClusterClient clusterClient;
-    //private readonly IUserMessageNotificationObserver signalrObserver;
+    private readonly IUserMessageNotificationObserver userMessageNotificationObserver;
     private readonly IUserChatNotificationObserver userChatNotificationObserver;
     private readonly IUserNotificationChannel userNotificationChannel;
     private readonly ILogger<NotificationBackgroundService> logger;
@@ -16,12 +16,13 @@ public class NotificationBackgroundService : BackgroundService
 
     public NotificationBackgroundService(
         IClusterClient clusterClient,
-        //IUserMessageNotificationObserver signalrObserver,
+        IUserMessageNotificationObserver userMessageNotificationObserver,
         IUserChatNotificationObserver userChatNotificationObserver,
         IUserNotificationChannel userNotificationChannel,
         ILogger<NotificationBackgroundService> logger)
     {
         this.clusterClient = clusterClient;
+        this.userMessageNotificationObserver = userMessageNotificationObserver;
         this.userChatNotificationObserver = userChatNotificationObserver;
 
         this.userNotificationChannel = userNotificationChannel;
@@ -32,19 +33,33 @@ public class NotificationBackgroundService : BackgroundService
     {
         this.logger.LogInformation("Notification background service is starting.");
         var subscriptionTask = Task.Run(() => 
-            this.CreateSubsciptionTask(stoppingToken));
+            this.CreateSubscriptionAsync(stoppingToken));
 
         var unSubscriptionTask = Task.Run(() =>
-            this.CreateUnsubscriptionTask(stoppingToken));
+            this.CreateUnSubscriptionAsync(stoppingToken));
 
         await Task.WhenAll(subscriptionTask, unSubscriptionTask);
         this.logger.LogInformation("Notification background service is stopping.");
     }
 
-    private async Task CreateSubsciptionTask(CancellationToken cancellationToken) 
+    private async Task CreateSubscriptionAsync(CancellationToken cancellationToken) 
     {
         this.logger.LogInformation("Subscription task is starting.");
-        await foreach(var item in this.userNotificationChannel
+
+        var tasks = new[]
+        {
+            this.SubscribeForChatsAsync(cancellationToken),
+            this.SubscribeForMessagesAsync(cancellationToken)
+        };
+
+        await Task.WhenAll(tasks);
+
+        this.logger.LogInformation("Subscription task is stopping.");
+    }
+
+    private async Task SubscribeForChatsAsync(CancellationToken cancellationToken) 
+    {
+        await foreach (var item in this.userNotificationChannel
             .GetSubscriptionEnumerableAsync(cancellationToken))
         {
             this.logger.LogTrace("Subscribing to user {userName}.", item.userName);
@@ -53,20 +68,53 @@ public class NotificationBackgroundService : BackgroundService
 
             var observerReference = this.clusterClient
                 .CreateObjectReference<IUserChatNotificationObserver>(
-                    userChatNotificationObserver);
+                    this.userChatNotificationObserver);
 
             await userChatNotificationGrain.SubscribeAsync(
                 observerReference);
 
             await Task.Delay(200, cancellationToken);
         }
-        this.logger.LogInformation("Subscription task is stopping.");
     }
 
-    private async Task CreateUnsubscriptionTask(CancellationToken cancellationToken)
+    private async Task SubscribeForMessagesAsync(CancellationToken cancellationToken)
+    {
+        await foreach (var item in this.userNotificationChannel
+            .GetSubscriptionEnumerableAsync(cancellationToken))
+        {
+            this.logger.LogTrace("Subscribing to user {userName}.", item.userName);
+            var userMessageNotificationGrain = this.clusterClient
+                .GetGrain<IUserMessageNotificationGrain>(item.userName);
+
+            var observerReference = this.clusterClient
+                .CreateObjectReference<IUserMessageNotificationObserver>(
+                    this.userMessageNotificationObserver);
+
+            await userMessageNotificationGrain.SubscribeAsync(
+                observerReference);
+
+            await Task.Delay(200, cancellationToken);
+        }
+    }
+
+    private async Task CreateUnSubscriptionAsync(CancellationToken cancellationToken)
     {
         this.logger.LogInformation("UnSubscription task is starting.");
-        await foreach(var item in this.userNotificationChannel
+        
+        var tasks = new[]
+        {
+            this.UnSubscribeForChatsAsync(cancellationToken),
+            this.UnSubscribeForMessagesAsync(cancellationToken)
+        };
+
+        await Task.WhenAll(tasks);
+
+        this.logger.LogInformation("UnSubscription task is stopping.");
+    }
+
+    private async Task UnSubscribeForChatsAsync(CancellationToken cancellationToken)
+    {
+        await foreach (var item in this.userNotificationChannel
             .GetUnSubscriptionEnumerableAsync(cancellationToken))
         {
             this.logger.LogTrace("Unsubscribing from user {userName}.", item.userName);
@@ -82,6 +130,25 @@ public class NotificationBackgroundService : BackgroundService
 
             await Task.Delay(200, cancellationToken);
         }
-        this.logger.LogInformation("UnSubscription task is stopping.");
+    }
+
+    private async Task UnSubscribeForMessagesAsync(CancellationToken cancellationToken)
+    {
+        await foreach (var item in this.userNotificationChannel
+            .GetUnSubscriptionEnumerableAsync(cancellationToken))
+        {
+            this.logger.LogTrace("Unsubscribing from user {userName}.", item.userName);
+            var userMessageNotificationGrain = this.clusterClient
+                .GetGrain<IUserMessageNotificationGrain>(item.userName);
+
+            var observerReference = this.clusterClient
+                .CreateObjectReference<IUserMessageNotificationObserver>(
+                    this.userMessageNotificationObserver);
+
+            await userMessageNotificationGrain.SubscribeAsync(
+                observerReference);
+
+            await Task.Delay(200, cancellationToken);
+        }
     }
 }

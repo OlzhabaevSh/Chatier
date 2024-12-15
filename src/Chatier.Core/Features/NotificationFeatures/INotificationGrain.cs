@@ -15,6 +15,7 @@ public interface INotificationGrain : IGrainWithGuidKey
         string topic,
         string content,
         DateTimeOffset createdAt,
+        Guid? messageId = null,
         bool scheduleSending = false);
 
     Task MarkAsReadedAsync();
@@ -62,6 +63,7 @@ public class NotificationGrain :
         string topic,
         string content,
         DateTimeOffset createdAt,
+        Guid? messageId = null,
         bool scheduleSending = false)
     {
         var notificationId = this.GetPrimaryKey();
@@ -83,7 +85,8 @@ public class NotificationGrain :
             Topic = topic,
             Content = content,
             CreatedAt = createdAt,
-            Status = NotificationStatus.Scheduled
+            Status = NotificationStatus.Scheduled,
+            MessageId = messageId
         };
         await notificationState.WriteStateAsync();
 
@@ -217,6 +220,9 @@ public class NotificationGrainState
 
     [Id(6)]
     public NotificationStatus Status { get; set; }
+
+    [Id(7)]
+    public Guid? MessageId { get; set; }
 }
 
 public enum NotificationStatus

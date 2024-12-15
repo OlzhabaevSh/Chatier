@@ -8,5 +8,6 @@ public interface IUserMessageNotificationObserver : IGrainObserver
         string senderName,
         string message,
         DateTimeOffset createdAt,
-        string receiverName);
+        string receiverName,
+        Guid messageId);
 }

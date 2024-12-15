@@ -6,6 +6,7 @@ using Chatier.Core.Features.UserFeatures;
 using Chatier.Core.Features.UserFeatures.Services;
 using Microsoft.AspNetCore.Mvc;
 using Orleans;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions = new JsonSerializerOptions(
+            JsonSerializerDefaults.Web);
+    });
 
 
 var app = builder.Build();
@@ -76,10 +82,34 @@ var apiGroup = app.MapGroup("/api");
 apiGroup.MapGet("/createUsers", async([FromServices] IClusterClient clusterClient) => 
 {
     var alphaGrain = clusterClient.GetGrain<IUserGrain>("alpha");
-    var betaGrain = clusterClient.GetGrain<IUserGrain>("beta");
+    var bravoGrain = clusterClient.GetGrain<IUserGrain>("bravo");
 
     var alphChatGrain = clusterClient.GetGrain<IUserChatGrain>("alpha");
-    var chatName = await alphChatGrain.CreateChatAsync("beta");
+    var chatName = await alphChatGrain.CreateChatAsync("bravo");
+
+    var chatGrain = clusterClient.GetGrain<IChatGrain>(chatName);
+
+    var msg1 = await chatGrain.SendMessageAsync("alpha", "Hello, bravo!");
+    var msg2 = await chatGrain.SendMessageAsync("bravo", "Hello, alpha!");
+
+    var msg3 = await chatGrain.SendMessageAsync("alpha", "How are you?");
+    var msg4 = await chatGrain.SendMessageAsync("bravo", "I'm fine, thank you!");
+
+    var msg5 = await chatGrain.SendMessageAsync("alpha", "Good to hear that!");
+
+    var messageIds = new[] { msg1, msg2, msg3, msg4, msg5 };
+
+    var alphaMessageGrain = clusterClient.GetGrain<IUserMessageNotificationGrain>("alpha");
+    var bravoMessageGrain = clusterClient.GetGrain<IUserMessageNotificationGrain>("bravo");
+
+    foreach (var item in messageIds)
+    {
+        var alphaNotificationId = await alphaMessageGrain.GetNotificationIdAsync(item);
+        var bravoNotificationId = await bravoMessageGrain.GetNotificationIdAsync(item);
+
+        await alphaGrain.ConfirmNotificationAsync(alphaNotificationId);
+        await bravoGrain.ConfirmNotificationAsync(bravoNotificationId);
+    }
 
     return Results.Ok(chatName);
 });
