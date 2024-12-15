@@ -5,7 +5,6 @@ using Chatier.Core.Features.NotificationFeatures.Services;
 using Chatier.Core.Features.UserFeatures;
 using Chatier.Core.Features.UserFeatures.Services;
 using Microsoft.AspNetCore.Mvc;
-using Orleans;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
