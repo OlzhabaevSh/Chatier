@@ -27,7 +27,7 @@ export interface IUserChat {
 export interface IChatMessage {
   id: string;
   chatName: string;
-  sender: string;
+  senderName: string;
   message: string;
   createdAt: Date;
 }
@@ -85,6 +85,10 @@ const selectChat = async (chatName: string) => {
   await connection.invoke('GetMessagesFromChatAsync', chatName);
 };
 
-export { eventTarget, startConnection, createChat, sendMessage, selectChat };  
+const getChats = async () => {
+  await connection.invoke('GetChatsAsync');
+};
+
+export { eventTarget, startConnection, createChat, sendMessage, selectChat, getChats };  
 export type { IUserChatNotification, IUserMessageNotification };
 

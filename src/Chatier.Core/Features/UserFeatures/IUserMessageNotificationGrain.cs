@@ -83,20 +83,23 @@ public class UserMessageNotificationGrain : Grain, IUserMessageNotificationGrain
         return Task.FromResult(this.grainState.State.Notifications.ToArray());
     }
 
-    public Task<Guid> GetNotificationIdAsync(Guid messageId)
+    public Task<Guid> GetNotificationIdAsync(
+        Guid messageId)
     {
         var notification = this.grainState.State.Notifications
             .FirstOrDefault(x => x.MessageId == messageId);
         return Task.FromResult(notification?.NotificationId ?? Guid.Empty);
     }
 
-    public Task SubscribeAsync(IUserMessageNotificationObserver observer) 
+    public Task SubscribeAsync(
+        IUserMessageNotificationObserver observer) 
     {
         this.observerManager.Subscribe(observer, observer); 
         return Task.CompletedTask; 
     }
 
-    public Task UnsubscribeAsync(IUserMessageNotificationObserver observer) 
+    public Task UnsubscribeAsync(
+        IUserMessageNotificationObserver observer) 
     {
         this.observerManager.Unsubscribe(observer); 
         return Task.CompletedTask; 

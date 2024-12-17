@@ -8,7 +8,8 @@ import {
   createChat,
   sendMessage,
   IChatMessage,
-  selectChat
+  selectChat,
+  getChats
 } from '../services/signalr';
 
 export interface IChat {
@@ -19,9 +20,10 @@ export interface IChat {
 export interface IMessage {
   id: string;
   chatName: string;
-  sender: string;
+  senderName: string;
   message: string;
   createdAt: Date;
+  notificationId?: string | undefined;
 }
 
 export const useNotifications = () => {
@@ -31,6 +33,8 @@ export const useNotifications = () => {
 
   const [chats, setChats] = useState<IChat[]>([]);
   const [messages, setMessages] = useState<IMessage[]>([]);
+
+  const [latestMessage, setLatestMessage] = useState<IMessage | undefined>(undefined);
 
   const [selectedChat, setSelectedChat] = useState<string | undefined>(undefined);
 
@@ -52,19 +56,16 @@ export const useNotifications = () => {
           }];
       });
     };
+    eventTarget.addEventListener('chatNotificationReceived', handleChatNotificationReceived);
 
     const handleMessageNotificationReceived = (event: Event) => {
       const customEvent = event as CustomEvent<IUserMessageNotification>;
 
       setMessageNotifications(prevMessageNotifications => [...prevMessageNotifications, customEvent.detail]);
-
-      const chatName = customEvent.detail.chatName;
-      if(chatName !== selectedChat) {
-        return;
-      }
-
-      setChats(prevChats => [...prevChats, { name: chatName, newMessages: true }]);
+      
+      setLatestMessage(customEvent.detail);
     };
+    eventTarget.addEventListener('messageNotificationReceived', handleMessageNotificationReceived);
 
     const handleChatsReceived = (event: Event) => {
       const customEvent = event as CustomEvent<IUserChat[]>;
@@ -82,19 +83,18 @@ export const useNotifications = () => {
         });
       });
     };
+    eventTarget.addEventListener('chatsReceived', handleChatsReceived);
 
     const messagesReceived = (event: Event) => {
       const customEvent = event as CustomEvent<IChatMessage[]>;
-      console.info('Shyn 1', customEvent.detail);
       setMessages(customEvent.detail);
     };
-
-    eventTarget.addEventListener('chatNotificationReceived', handleChatNotificationReceived);
-    eventTarget.addEventListener('messageNotificationReceived', handleMessageNotificationReceived);
-    eventTarget.addEventListener('chatsReceived', handleChatsReceived);
     eventTarget.addEventListener('messagesReceived', messagesReceived);
 
-    startConnection().then(() => setIsConnected(true));
+    startConnection().then(() => {
+      setIsConnected(true);
+      getChats();
+    });
 
     return () => {
       eventTarget.removeEventListener('chatNotificationReceived', handleChatNotificationReceived);
@@ -111,6 +111,24 @@ export const useNotifications = () => {
 
     selectChat(selectedChat);
   }, [selectedChat]);
+
+  useEffect(() => {
+    if(!latestMessage) {
+      return;
+    }
+
+    if(selectedChat !== latestMessage.chatName) {
+      return;
+    }
+
+    setMessages(prevMessages => [...prevMessages, {
+      id: latestMessage.id,
+      chatName: latestMessage.chatName,
+      senderName: latestMessage.senderName,
+      message: latestMessage.message,
+      createdAt: latestMessage.createdAt
+    }]);
+  }, [latestMessage, selectedChat]);
 
   return { 
     chatNotifications, 

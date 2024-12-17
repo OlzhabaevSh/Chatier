@@ -61,7 +61,7 @@ export const ChatDetailsMain = (props: IChatDetailsProps) => {
                     key={data.id}
                     timeStamp={formatTime(data.createdAt)}
                     activityDescription={[
-                        <>{data.sender}</>,
+                        <>{data.senderName}</>,
                         <Label>{data.message}</Label>
                     ]} />
             );

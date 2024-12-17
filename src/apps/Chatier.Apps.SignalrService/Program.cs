@@ -23,6 +23,7 @@ builder.Services.AddSingleton<IUserChatNotificationObserver, SignalrUserChatNoti
 builder.Services.AddSingleton<IUserNotificationChannel, UserNotificationChannel>();
 
 builder.Services.AddScoped<IEmailService, FakeEmailService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Host.UseOrleans(static siloBuilder => 
 {

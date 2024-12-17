@@ -9,15 +9,12 @@ namespace Chatier.Apps.SignalrService.Hubs;
 [AllowAnonymous]
 public class UserHub : Hub
 {
-    private readonly IUserNotificationChannel userNotificationChannel;
-    private readonly IClusterClient clusterClient;
+    private readonly IUserService userService;
 
     public UserHub(
-        IUserNotificationChannel userNotificationChannel,
-        IClusterClient clusterClient)
+        IUserService userService)
     {
-        this.userNotificationChannel = userNotificationChannel;
-        this.clusterClient = clusterClient;
+        this.userService = userService;
     }
 
     public override async Task OnConnectedAsync()
@@ -25,18 +22,13 @@ public class UserHub : Hub
         var connectionId = this.Context.ConnectionId;
         var userName = this.GetUserName();
 
-        await this.Groups.AddToGroupAsync(connectionId, userName);
+        await this.Groups.AddToGroupAsync(
+            connectionId, 
+            userName);
 
-        await this.userNotificationChannel.SubscribeAsync(
-            userName, 
-            connectionId);
-
-        var userChatGrain = this.clusterClient.GetGrain<IUserChatGrain>(userName);
-        var chats = await userChatGrain.GetChatsAsync();
-
-        await this.Clients.Caller.SendAsync(
-            "ReceiveChats", 
-            chats);
+        await this.userService.SubscribeToEvents(
+            connectionId,
+            userName);
 
         await base.OnConnectedAsync();
     }
@@ -46,44 +38,49 @@ public class UserHub : Hub
         var connectionId = this.Context.ConnectionId;
         var userName = this.GetUserName();
 
-        await this.userNotificationChannel.UnSubscribeAsync(
-            userName,
-            connectionId);
+        await this.Groups.RemoveFromGroupAsync(
+            connectionId,
+            userName);
+
+        await this.userService.UnSubscribeFromEvents(
+            connectionId,
+            userName);
 
         await base.OnDisconnectedAsync(exception);
+    }
+
+    public async Task GetChatsAsync() 
+    {
+        var userName = this.GetUserName();
+
+        var chats = await this.userService.GetAllChatsAsync(userName);
+
+        await this.Clients.Caller.SendAsync(
+            "ReceiveChats",
+            chats);
     }
 
     public async Task CreateChatAsync(string userName) 
     {
         var myName = this.GetUserName();
-        var userChatGrain = this.clusterClient.GetGrain<IUserChatGrain>(myName);
-        var chatId = await userChatGrain.CreateChatAsync(userName);
+        _ = await this.userService.CreateChatAsync(myName, userName);
     }
 
     public async Task SendMessageAsync(string chatName, string message)
     {
         var myName = this.GetUserName();
 
-        var chatGrain = this.clusterClient.GetGrain<IChatGrain>(chatName);
-        await chatGrain.SendMessageAsync(myName, message);
+        _ = await this.userService.SendMessageAsync(
+            chatName,
+            myName,
+            message);
     }
 
     public async Task GetMessagesFromChatAsync(string chatName) 
     {
         var myName = this.GetUserName();
 
-        var chatGrain = this.clusterClient.GetGrain<IChatGrain>(chatName);
-
-        var messages = await chatGrain.GetMessagesAsync();
-
-        var result = messages.Select(x => new 
-        {
-            Id = x.Key,
-            x.Value.Sender,
-            x.Value.Message,
-            x.Value.CreatedAt,
-            ChatName = chatName
-        }).ToList();
+        var result = await this.userService.GetMessagesFromChatAsync(chatName);
 
         await this.Clients.Caller.SendAsync(
             "ReceiveMessages",

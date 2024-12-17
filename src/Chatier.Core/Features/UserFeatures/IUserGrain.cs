@@ -42,11 +42,7 @@ public sealed class UserGrain : Grain, IUserGrain
         string message)
     {
         var myName = this.GetPrimaryKeyString();
-        if (sender == myName)
-        {
-            return;
-        }
-
+        
         var notificationId = Guid.NewGuid();
         var createdAt = DateTimeOffset.UtcNow;
 
@@ -72,6 +68,11 @@ public sealed class UserGrain : Grain, IUserGrain
             message: message,
             createdAt: createdAt,
             messageId: messageId);
+
+        if (sender == myName)
+        {
+            return;
+        }
 
         var notificationGrain = this.GrainFactory.GetGrain<INotificationGrain>(
             notificationId);
