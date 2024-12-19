@@ -24,7 +24,7 @@ const args : IChatMasterProps = {
         newMessages: false
     }, {
         name: 'Chat 2',
-        newMessages: false
+        newMessages: true
     }],
     setSelectedChat: (chatName) => {
         console.log(`Selected chat: ${chatName}`);

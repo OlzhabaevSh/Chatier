@@ -5,7 +5,8 @@ import { ChatDetailsMain } from "./chatDetailsMain";
 export interface IChatDetailsProps {
     messages: IMessage[];
     selectedChat: string | undefined
-    sendMessage: (chatName: string, message: string) => Promise<void>;
+    sendMessage: (chatName: string, message: string) => Promise<void>
+    ownName: string;
 }
 
 export const ChatDetails = (props: IChatDetailsProps) => {

@@ -4,6 +4,7 @@ import { ChatDetails } from "./chatDetails";
 import { useEffect } from "react";
 import { useNotifications } from "../hooks/useNotifications";
 import { Container } from "../layout/container";
+import { useUser } from "../hooks/useUser";
 
 const stackStyles: Partial<IStackStyles> = {
     root: {
@@ -16,6 +17,9 @@ const stackStyles: Partial<IStackStyles> = {
 };
 
 export const ChatDashboard = () => {
+    
+    const [userName] = useUser();
+
     const { 
         chats, 
         messages, 
@@ -32,7 +36,7 @@ export const ChatDashboard = () => {
 
         setSelectedChat(selectedChat);
     }, [setSelectedChat, selectedChat]);
-
+    
     return (
         <Stack
             horizontalAlign="baseline" 
@@ -54,7 +58,8 @@ export const ChatDashboard = () => {
                         <ChatDetails 
                             selectedChat={selectedChat}
                             messages={messages}
-                            sendMessage={sendMessage} />
+                            sendMessage={sendMessage}
+                            ownName={userName!} />
                     </Container>
                 </Stack.Item>
         </Stack>

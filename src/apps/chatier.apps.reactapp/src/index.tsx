@@ -2,6 +2,7 @@ import { App } from './App';
 import { mergeStyles } from '@fluentui/react';
 import reportWebVitals from './reportWebVitals';
 import ReactDOM from 'react-dom';
+import { StrictMode } from 'react';
 
 // Inject some global styles
 mergeStyles({
@@ -13,7 +14,11 @@ mergeStyles({
 });
 
 // eslint-disable-next-line no-restricted-globals
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <StrictMode>
+    <App />
+  </StrictMode>, 
+  document.getElementById('root'));
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))

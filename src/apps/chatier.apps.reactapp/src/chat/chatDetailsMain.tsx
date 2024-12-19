@@ -1,9 +1,22 @@
-import { ActivityItem, DocumentCard, DocumentCardActivity, DocumentCardDetails, DocumentCardTitle, FocusZone, IconButton, IIconProps, IStackTokens, Label, Link, List, Stack, TextField } from "@fluentui/react";
+import { 
+    ActivityItem, 
+    FontSizes, 
+    FontWeights, 
+    IconButton, 
+    IIconProps, 
+    IStackTokens, 
+    Label, 
+    List, 
+    SharedColors, 
+    Stack, 
+    Text, 
+    TextField 
+} from "@fluentui/react";
 import { IChatDetailsProps } from "./chatDetails";
 import { useState } from "react";
 import { IMessage } from "../hooks/useNotifications";
 
-const stackTokens: IStackTokens = { childrenGap: 5 };
+const stackTokens: IStackTokens = { childrenGap: 2 };
 
 const imojiIcon: IIconProps = { iconName: 'Send' };
 
@@ -12,21 +25,6 @@ const formatTime = (date: Date) => {
     return dateObj.toLocaleTimeString('en-US', { 
         hour12: false 
     }); 
-};
-
-const activityItemStyles = { 
-    root: { 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'flex-start', 
-        width: '100%', 
-    }, 
-    activityContent: { 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'flex-start', 
-        width: '100%', 
-    }, 
 };
 
 export const ChatDetailsMain = (props: IChatDetailsProps) => {
@@ -51,33 +49,41 @@ export const ChatDetailsMain = (props: IChatDetailsProps) => {
                 return (<div>error</div>);
             }
 
+            const i = index! ? 0 : index;
+            const key = `${data.id}-${i}`;
+            const fontColor = data.senderName != props.ownName 
+                ? SharedColors.red20 
+                : SharedColors.gray20;
+
             return (
                 <ActivityItem
                     style={{
                         width: '100%', 
-                        marginBottom: '2vh',
+                        marginBottom: '1vh',
                         textAlign: 'left'
                     }}
-                    key={data.id}
+                    key={`${key}`}
                     timeStamp={formatTime(data.createdAt)}
                     activityDescription={[
-                        <>{data.senderName}</>,
-                        <Label>{data.message}</Label>
+                        <Text style={{ fontWeight: FontWeights.semibold, fontSize: FontSizes.size14, color: fontColor }} key={1}>{data.senderName}</Text>,
+                        <br key={2}/>,
+                        <Text style={{ fontWeight: FontWeights.regular, fontSize: FontSizes.size16 }} key={3}>{data.message}</Text>
                     ]} />
             );
         };
 
     return (
         <Stack 
-            style={{width: '100%', height: '100%'}}
+            verticalFill
+            styles={{ root: { width: '100%', height: '100%', display: 'flex', flexDirection: 'column' } }}
             tokens={stackTokens}>
             <Stack.Item 
                 align="auto">
-                <h4>{props.selectedChat}</h4>
+                <Label style={{ fontWeight: FontWeights.light, fontSize: FontSizes.size20 }}>{props.selectedChat}</Label>
             </Stack.Item>
             <Stack.Item 
-                align="stretch"
-                grow>
+                grow 
+                styles={{ root: { overflowY: 'auto' } }}>
                     <List 
                         items={props.messages} 
                         onRenderCell={onRenderCell}/>

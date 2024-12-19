@@ -116,18 +116,42 @@ export const useNotifications = () => {
     if(!latestMessage) {
       return;
     }
-
+    console.info('shyn 1.1');
     if(selectedChat !== latestMessage.chatName) {
-      return;
+      console.info('shyn 1.1.1');
+      /*
+      setChats(prevChats => prevChats.map(chat => {
+        if(chat.name === latestMessage.chatName) {
+          return {
+            ...chat,
+            newMessages: true
+          };
+        }
+        return chat;
+      }));
+      */
+    } else {
+      console.info('shyn 1.1.2');
+      /*
+      const updatedChats = chats.map(chat => {
+        if(chat.name === selectedChat) {
+          return {
+            ...chat,
+            newMessages: false
+          };
+        }
+        return chat;
+      });
+      setChats(updatedChats);
+      */
+      setMessages(prevMessages => [...prevMessages, {
+        id: latestMessage.id,
+        chatName: latestMessage.chatName,
+        senderName: latestMessage.senderName,
+        message: latestMessage.message,
+        createdAt: latestMessage.createdAt
+      }]);
     }
-
-    setMessages(prevMessages => [...prevMessages, {
-      id: latestMessage.id,
-      chatName: latestMessage.chatName,
-      senderName: latestMessage.senderName,
-      message: latestMessage.message,
-      createdAt: latestMessage.createdAt
-    }]);
   }, [latestMessage, selectedChat]);
 
   return { 
