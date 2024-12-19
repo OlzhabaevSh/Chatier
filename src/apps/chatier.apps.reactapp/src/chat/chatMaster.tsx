@@ -1,4 +1,19 @@
-import { CheckboxVisibility, DetailsList, DetailsListLayoutMode, FocusZone, IColumn, Icon, IconButton, IIconProps, IStackTokens, Selection, SelectionMode, SharedColors, Stack, TextField } from "@fluentui/react";
+import { 
+    CheckboxVisibility, 
+    DetailsList, 
+    DetailsListLayoutMode, 
+    FocusZone, 
+    IColumn, 
+    Icon, 
+    IconButton, 
+    IIconProps, 
+    IStackTokens, 
+    Selection, 
+    SelectionMode, 
+    SharedColors, 
+    Stack, 
+    TextField 
+} from "@fluentui/react";
 import { IChat } from "../hooks/useNotifications";
 import React, { ReactNode, useState } from "react";
 
