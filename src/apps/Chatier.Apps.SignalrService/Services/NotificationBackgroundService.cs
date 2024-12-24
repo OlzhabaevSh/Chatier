@@ -58,6 +58,7 @@ public class NotificationBackgroundService : BackgroundService
         {
             this.logger.LogTrace("Subscribing to user {userName}.", item.userName);
 
+            await this.SetUserStatusAsync(item.userName, true);
             await this.SubscribeForChatsAsync(item);
             await this.SubscribeForMessagesAsync(item);
 
@@ -123,6 +124,7 @@ public class NotificationBackgroundService : BackgroundService
         {
             this.logger.LogTrace("Unsubscribing from user {userName}.", item.userName);
 
+            await this.SetUserStatusAsync(item.userName, false);
             await this.UnSubscribeForChatsAsync(item);
             await this.UnSubscribeForMessagesAsync(item);
 
@@ -168,5 +170,13 @@ public class NotificationBackgroundService : BackgroundService
                 item.userName, 
                 out _);
         }
+    }
+
+    private async Task SetUserStatusAsync(string userName,
+        bool isOnline)
+    {
+        var userStatusGrain = this.clusterClient
+            .GetGrain<IUserStatusGrain>(userName);
+        await userStatusGrain.SetStatusAsync(isOnline);
     }
 }

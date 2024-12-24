@@ -99,10 +99,10 @@ public class UserService : IUserService
 
         return messages.Select(x => new ChatDto
         {
-            Id = x.Key,
-            SenderName = x.Value.Sender,
-            Message = x.Value.Message,
-            CreatedAt = x.Value.CreatedAt,
+            Id = x.Id,
+            SenderName = x.Sender,
+            Message = x.Message,
+            CreatedAt = x.CreatedAt,
             ChatName = chatName
         }).ToArray();
     }

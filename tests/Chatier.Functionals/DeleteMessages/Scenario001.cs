@@ -57,7 +57,7 @@ public class Scenario001
             .Where(m => !m.Remove)
             .ToArray();
 
-        chatMessages.Count.Should().Be(expectedMessages.Length);
+        chatMessages.Length.Should().Be(expectedMessages.Length);
     }
 
     #region Helpers

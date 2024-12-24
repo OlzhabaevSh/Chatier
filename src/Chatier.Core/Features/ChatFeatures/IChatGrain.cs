@@ -1,4 +1,5 @@
 ﻿using Chatier.Core.Features.UserFeatures;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Chatier.Core.Features.ChatFeatures;
@@ -21,7 +22,7 @@ public interface IChatGrain : IGrainWithStringKey
 
     Task<string[]> GetUsersAsync();
 
-    Task<Dictionary<Guid, ChatMessageItem>> GetMessagesAsync();
+    Task<ChatMessageItem[]> GetMessagesAsync();
 }
 #endregion
 
@@ -30,19 +31,26 @@ public class ChatGrain : Grain, IChatGrain
 {
     private readonly IPersistentState<UsersChatGrainState> usersState;
     private readonly IPersistentState<MessagesChatGrainState> messagesState;
-
     private readonly ILogger<ChatGrain> logger;
+    private readonly uint capacity;
 
     public ChatGrain(
         [PersistentState("chatUsers", "chatStore")]
         IPersistentState<UsersChatGrainState> usersState,
         [PersistentState("chatMessages", "chatStore")]
         IPersistentState<MessagesChatGrainState> messagesState,
+        IConfiguration configuration,
         ILogger<ChatGrain> logger)
     {
         this.usersState = usersState;
         this.messagesState = messagesState;
         this.logger = logger;
+
+        var chatCapacity = configuration.GetValue<int>("ChatCapacity");
+
+        this.capacity = chatCapacity > 0 
+            ? (uint)chatCapacity 
+            : 100;
     }
 
     public Task<string[]> GetUsersAsync()
@@ -123,9 +131,9 @@ public class ChatGrain : Grain, IChatGrain
         }
     }
 
-    public Task<Dictionary<Guid, ChatMessageItem>> GetMessagesAsync()
+    public Task<ChatMessageItem[]> GetMessagesAsync()
     {
-        var messages = this.messagesState.State.Messages;
+        var messages = this.messagesState.State.Messages.ToArray();
         return Task.FromResult(messages);
     }
 
@@ -135,15 +143,18 @@ public class ChatGrain : Grain, IChatGrain
     {
         var messageId = Guid.NewGuid();
 
-        this.messagesState.State.Messages.Add(
-            key: messageId,
-            value: new ChatMessageItem()
-            {
-                Id = messageId,
-                Sender = userName,
-                Message = message,
-                CreatedAt = DateTimeOffset.UtcNow
-            });
+        if(this.messagesState.State.Messages.Count >= this.capacity)
+        {
+            this.messagesState.State.Messages.RemoveFirst();
+        }
+
+        this.messagesState.State.Messages.AddLast(new ChatMessageItem()
+        {
+            Id = messageId,
+            Sender = userName,
+            Message = message,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
 
         await this.messagesState.WriteStateAsync();
 
@@ -165,17 +176,19 @@ public class ChatGrain : Grain, IChatGrain
         Guid messageId,
         string caller)
     {
-        if (!this.messagesState.State.Messages.ContainsKey(messageId))
+        var message = this.messagesState.State.Messages.FirstOrDefault(m => m.Id == messageId);
+
+        if (message is null)
         {
             return false;
         }
 
-        if (this.messagesState.State.Messages[messageId].Sender != caller)
+        if (message.Sender != caller)
         {
             return false;
         }
 
-        this.messagesState.State.Messages.Remove(messageId);
+        this.messagesState.State.Messages.Remove(message);
         await this.messagesState.WriteStateAsync();
 
         return true;
@@ -195,7 +208,7 @@ public class UsersChatGrainState
 public class MessagesChatGrainState
 {
     [Id(0)]
-    public required Dictionary<Guid, ChatMessageItem> Messages { get; set; } = new Dictionary<Guid, ChatMessageItem>();
+    public required LinkedList<ChatMessageItem> Messages { get; set; } = new LinkedList<ChatMessageItem>();
 }
 
 [GenerateSerializer]
