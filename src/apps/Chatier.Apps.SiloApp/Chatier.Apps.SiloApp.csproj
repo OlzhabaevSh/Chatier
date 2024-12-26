@@ -7,11 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
     <PackageReference Include="Aspire.StackExchange.Redis" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
     <PackageReference Include="Microsoft.Orleans.Clustering.Redis" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Orleans.Persistence.AdoNet" Version="9.0.1" />
     <PackageReference Include="Microsoft.Orleans.Persistence.Redis" Version="9.0.1" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="9.0.1" />
+    <PackageReference Include="OrleansDashboard" Version="8.2.0" />
   </ItemGroup>
 
   <ItemGroup>

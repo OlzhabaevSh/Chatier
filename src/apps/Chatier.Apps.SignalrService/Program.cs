@@ -1,17 +1,11 @@
 using Chatier.Apps.SignalrService.Hubs;
 using Chatier.Apps.SignalrService.Services;
-using Chatier.Core.Features.ChatFeatures;
-using Chatier.Core.Features.NotificationFeatures.Services;
-using Chatier.Core.Features.UserFeatures;
 using Chatier.Core.Features.UserFeatures.Services;
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.AddServiceDefaults();
 
 builder.Services.AddSignalR();
 
@@ -22,32 +16,16 @@ builder.Services.AddSingleton<IUserMessageNotificationObserver, SignalrUserMessa
 builder.Services.AddSingleton<IUserChatNotificationObserver, SignalrUserChatNotificationObserver>();
 builder.Services.AddSingleton<IUserNotificationChannel, UserNotificationChannel>();
 
-builder.Services.AddScoped<IEmailService, FakeEmailService>();
+// builder.Services.AddScoped<IEmailService, FakeEmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
-builder.Host.UseOrleans(static siloBuilder => 
-{
-    siloBuilder.UseLocalhostClustering();
-
-    // configure grain storage
-    siloBuilder.AddMemoryGrainStorage("chatStore");
-    siloBuilder.AddMemoryGrainStorage("notificationStore");
-    siloBuilder.AddMemoryGrainStorage("userStore");
-    siloBuilder.AddMemoryGrainStorage("userNotifications");
-    siloBuilder.AddMemoryGrainStorage("PubSubStore");
-    siloBuilder.AddMemoryGrainStorage("UserGroupState");
-
-    // configure streams
-    siloBuilder.AddMemoryStreams("MemoryStreamProvider");
-    // configure reminder service
-    siloBuilder.UseInMemoryReminderService();
-
-    // configure dashboard
-    siloBuilder.UseDashboard(x => 
-    {
-        x.HostSelf = true;
-    });
-});
+// setup orleans client
+// clustering
+builder.AddKeyedRedisClient("chatierClusteringRedis");
+builder.AddKeyedRedisClient("chatierGrainStorageRedis");
+builder.AddKeyedRedisClient("chatierSystemRedis");
+// orleans
+builder.UseOrleansClient();
 
 builder.Services.AddCors(options =>
 {
@@ -83,6 +61,6 @@ app.UseHttpsRedirection();
 
 app.MapHub<UserHub>("/userHub");
 
-app.Map("/dashboard", x => x.UseOrleansDashboard());
+// app.Map("/dashboard", x => x.UseOrleansDashboard());
 
 app.Run();

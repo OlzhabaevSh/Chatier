@@ -15,6 +15,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Functionals", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Apps.SignalrService", "src\apps\Chatier.Apps.SignalrService\Chatier.Apps.SignalrService.csproj", "{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Apps.SiloApp", "src\apps\Chatier.Apps.SiloApp\Chatier.Apps.SiloApp.csproj", "{B3E08A23-EC86-4C59-BE77-82C30A459B05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Apps.AspireApp.AppHost", "Chatier.Apps.AspireApp\Chatier.Apps.AspireApp.AppHost\Chatier.Apps.AspireApp.AppHost.csproj", "{6FC74DB2-0882-464D-AF9C-D049FAC97834}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chatier.Apps.AspireApp.ServiceDefaults", "Chatier.Apps.AspireApp\Chatier.Apps.AspireApp.ServiceDefaults\Chatier.Apps.AspireApp.ServiceDefaults.csproj", "{A6E48AE9-7F61-49FA-A6C8-BC72232D6648}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +39,18 @@ Global
 		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3E08A23-EC86-4C59-BE77-82C30A459B05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3E08A23-EC86-4C59-BE77-82C30A459B05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3E08A23-EC86-4C59-BE77-82C30A459B05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3E08A23-EC86-4C59-BE77-82C30A459B05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FC74DB2-0882-464D-AF9C-D049FAC97834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FC74DB2-0882-464D-AF9C-D049FAC97834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FC74DB2-0882-464D-AF9C-D049FAC97834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FC74DB2-0882-464D-AF9C-D049FAC97834}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6E48AE9-7F61-49FA-A6C8-BC72232D6648}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6E48AE9-7F61-49FA-A6C8-BC72232D6648}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6E48AE9-7F61-49FA-A6C8-BC72232D6648}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6E48AE9-7F61-49FA-A6C8-BC72232D6648}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,5 +60,8 @@ Global
 		{939FFFBB-33BA-4A4B-A1D5-E27F349E05C6} = {A95DAF4B-98C2-4865-93D3-1D22FB7F1BCE}
 		{50D8EA09-EE9B-444B-9612-6B09ADE4647E} = {A4FC734B-A281-4B74-B1E3-227AA5EFBC36}
 		{A54FBD18-D0F1-4314-92C9-14DD6B610C2A} = {A8853B3C-46DD-462E-A1AB-93DE1962F1F8}
+		{B3E08A23-EC86-4C59-BE77-82C30A459B05} = {A8853B3C-46DD-462E-A1AB-93DE1962F1F8}
+		{6FC74DB2-0882-464D-AF9C-D049FAC97834} = {A8853B3C-46DD-462E-A1AB-93DE1962F1F8}
+		{A6E48AE9-7F61-49FA-A6C8-BC72232D6648} = {A8853B3C-46DD-462E-A1AB-93DE1962F1F8}
 	EndGlobalSection
 EndGlobal
